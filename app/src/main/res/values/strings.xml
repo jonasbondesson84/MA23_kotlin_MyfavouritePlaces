@@ -30,6 +30,7 @@
     <string name="saveFavourite">Save as favourite</string>
     <string name="editFavourite">Edit favourite</string>
     <string name="deleteFavourite">Delete favourite</string>
+    <string name="myAccount">My Account</string>
 
     <string name="warning">Warning</string>
     <string name="deleteDesc">Do you really want to delete this item?</string>
