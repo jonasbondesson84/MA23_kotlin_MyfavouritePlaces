@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         bottomNav.setOnNavigationItemSelectedListener {item ->
-            when(item.itemId) {
+            when(item.itemId) { 
                 R.id.home_fragment -> {
                     navController.navigate(R.id.home_fragment)
                     true
