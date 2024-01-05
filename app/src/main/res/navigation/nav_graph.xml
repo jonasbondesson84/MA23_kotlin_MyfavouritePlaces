@@ -25,4 +25,9 @@
         android:name="com.example.myfavouriteplaces.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.myfavouriteplaces.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
 </navigation>
