@@ -1,16 +1,27 @@
 package com.example.myfavouriteplaces
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,8 +29,14 @@ class MainActivity : AppCompatActivity() {
     lateinit var navHostFragment: NavHostFragment
     lateinit var navController: NavController
     private lateinit var auth: FirebaseAuth
-
     private lateinit var db: FirebaseFirestore
+    private lateinit var locationProvider: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+    private val REQUEST_LOCATION = 1
+    private var lat: Double? = null
+    private var lng: Double? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,6 +46,23 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         auth = Firebase.auth
         db = Firebase.firestore
+        locationProvider = LocationServices.getFusedLocationProviderClient(this)
+        locationRequest = LocationRequest.Builder(2000L).build()
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+
+            }
+        }
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION)
+        }
+
+        checkIfUserIsLoggedIn()
+
+
 
         NavigationUI.setupWithNavController(
             bottomNav, navController
@@ -58,6 +92,118 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else -> false
+            }
+        }
+    }
+
+    private fun checkIfUserIsLoggedIn() {
+        val user = auth.currentUser
+        if(user != null) {
+            getUserDetails(user)
+        }
+        getLastLocation()
+
+    }
+
+    private fun getUserDetails(user: FirebaseUser) {
+        db.collection("usersCollection").get().addOnSuccessListener {documentSnapshot ->
+            for(document in documentSnapshot) {
+                if(document.get("userID").toString() == user.uid) {
+                    Log.d("!!!", "Got it!")
+                    val user = document.toObject<User>()
+                    currentUser.name = user.name
+                    currentUser.userID = user.userID
+                    currentUser.userImage = user.userImage
+                    currentUser.location = user.location
+                    currentUser.documentId = user.documentId
+                    Log.d("!!!", currentUser.documentId.toString())
+                    getUserFavourites()
+                    getSharedFavourites()
+                    return@addOnSuccessListener
+                }
+            }
+            Log.d("!!!", "user not found!")
+        }
+
+    }
+
+    private fun getUserFavourites() {
+        currentUser.favouritesList.clear()
+        if (currentUser.userID == null) {
+            //Snackbar.make(view, getString(R.string.mustBeSignedIn), 2000).show()
+            return
+        } else {
+            db.collection("users").document(currentUser.userID.toString()).collection("favourites").get()
+                .addOnSuccessListener { documentSnapshot ->
+                    for (document in documentSnapshot.documents) {
+                        val place = document.toObject<Place>()
+                        if (place != null) {
+                            currentUser.favouritesList.add(place)
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun getSharedFavourites() {
+        db.collection("usersCollection").get().addOnSuccessListener { documentSnapshot ->
+            for (document in documentSnapshot) {
+
+                val user = document.get("userID").toString()
+                if(user != null) {
+                    db.collection("users").document(user).collection("favourites").get()
+                        .addOnSuccessListener {
+                            for(document in it) {
+                                val place = document.toObject<Place>()
+                                if(place != null  && place.public == true) {
+                                    currentUser.sharedFavouritesList.add(place)
+                                    //currentUser.favouritesList.add(place)
+                                    Log.d("!!!", "place: ${place.docID}")
+                                }
+                            }
+                        }
+                }
+            }
+        }
+    }
+
+    private fun getLastLocation() {
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            locationProvider.lastLocation.addOnCompleteListener {task->
+                if(task.isSuccessful) {
+                    val location = task.result
+
+                    if (location != null) {
+
+                        lat = location.latitude
+                        lng = location.longitude
+
+//                        Snackbar.make(flMain, "lat: ${location.latitude} lng: ${location.longitude}", 2000).show()
+                        Log.d("!!!", "lat: ${location.latitude} lng: ${location.longitude}")
+                    } else {
+                        val sthlm = LatLng(59.334591, 18.063240)
+                        lat = sthlm.latitude
+                        lng = sthlm.longitude
+                        Log.d("!!!", "No location")
+                    }
+                    currentUser.latLng = LatLng(lat!!, lng!!)
+
+
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == REQUEST_LOCATION) {
+            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLastLocation()
             }
         }
     }

@@ -1,10 +1,21 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +31,13 @@ class AccountFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
+    private lateinit var etvName: EditText
+    private lateinit var etvLocation: EditText
+    private lateinit var btnSave: Button
+    private lateinit var tvAccount: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +52,65 @@ class AccountFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_account, container, false)
+        val view = inflater.inflate(R.layout.fragment_account, container, false)
+        auth = Firebase.auth
+        db = Firebase.firestore
+        btnSave = view.findViewById(R.id.btnSave)
+        etvLocation = view.findViewById(R.id.etvAccountLocation)
+        etvName = view.findViewById(R.id.etcAccountName)
+        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
+        tvAccount = view.findViewById(R.id.tvAccount)
+        Log.d("!!!", currentUser.name.toString())
+        tvAccount.text=auth.currentUser?.email
+        if(currentUser.name != null) {
+
+            etvName.setText(currentUser.name)
+        }
+        if(currentUser.location != null) {
+            etvLocation.setText(currentUser.location)
+        }
+        btnSave.setOnClickListener {
+            saveData()
+        }
+        topAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.menuLogoutAccount -> {
+                    signOut()
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+
+        return view
+    }
+
+    private fun saveData() {
+        val name = etvName.text.toString()
+        val location = etvLocation.text.toString()
+        Log.d("!!!", currentUser.documentId.toString())
+        if(currentUser.userID != null) {
+            db.collection("usersCollection").document(currentUser.documentId.toString())
+                .update("name", name)
+                .addOnCompleteListener {task ->
+                    if(task.isSuccessful) {
+                        Log.d("!!!", "got here")
+                        findNavController().navigate(R.id.action_account_fragment_to_home_fragment)
+//                        (activity as MainActivity).switchFragment(StartFragment())
+                    }
+
+                }
+        }
+    }
+
+    private fun signOut() {
+        currentUser.resetUser()
+
+        auth.signOut()
+        findNavController().navigate(R.id.loginFragment)
+//        (activity as MainActivity).switchFragment(LoginFragment())
     }
 
     companion object {

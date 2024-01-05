@@ -19,7 +19,11 @@
         android:id="@+id/account_fragment"
         android:name="com.example.myfavouriteplaces.AccountFragment"
         android:label="fragment_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_account_fragment_to_home_fragment"
+            app:destination="@id/home_fragment" />
+    </fragment>
     <fragment
         android:id="@+id/maps_fragment"
         android:name="com.example.myfavouriteplaces.MapsFragment"
@@ -29,5 +33,12 @@
         android:id="@+id/loginFragment"
         android:name="com.example.myfavouriteplaces.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_home_fragment"
+            app:destination="@id/home_fragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_account_fragment"
+            app:destination="@id/account_fragment" />
+    </fragment>
 </navigation>

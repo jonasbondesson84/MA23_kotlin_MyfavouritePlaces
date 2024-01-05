@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -82,6 +83,7 @@ class LoginFragment : Fragment() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     getCurrentUserInfo()
+                    findNavController().navigate(R.id.action_loginFragment_to_home_fragment)
 //                    (activity as MainActivity).switchFragment(StartFragment())
                 } else {
                     Snackbar.make(view, getText(R.string.errorLogIn), 2000).show()
@@ -104,6 +106,7 @@ class LoginFragment : Fragment() {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     getCurrentUserInfo()
+                                    findNavController().navigate(R.id.action_loginFragment_to_account_fragment)
                                     //(activity as MainActivity).switchFragment(StartFragment())
                                 } else {
                                     Snackbar.make(view, getString(R.string.errorSignUp), 2000)
