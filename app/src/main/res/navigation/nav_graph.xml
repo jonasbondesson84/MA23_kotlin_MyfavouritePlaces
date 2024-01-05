@@ -14,7 +14,11 @@
         android:id="@+id/favourites_fragment"
         android:name="com.example.myfavouriteplaces.FavouritesFragment"
         android:label="fragment_favourites"
-        tools:layout="@layout/fragment_favourites" />
+        tools:layout="@layout/fragment_favourites" >
+        <action
+            android:id="@+id/action_favourites_fragment_to_maps_fragment"
+            app:destination="@id/maps_fragment" />
+    </fragment>
     <fragment
         android:id="@+id/account_fragment"
         android:name="com.example.myfavouriteplaces.AccountFragment"
