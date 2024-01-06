@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuSavePlace"
+        android:icon="@drawable/outline_favorite_border_24"
+        android:title="@string/saveFavourite"
+        android:contentDescription="@string/saveFavourite"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menuEditFavourite"
+        android:icon="@drawable/baseline_edit_24"
+        android:title="@string/editFavourite"
+        android:contentDescription="@string/editFavourite"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menuDeleteFavourite"
+        android:icon="@drawable/baseline_delete_forever_24"
+        android:title="@string/deleteFavourite"
+        android:contentDescription="@string/deleteFavourite"
+        app:showAsAction="never"/>
+
+
+</menu>

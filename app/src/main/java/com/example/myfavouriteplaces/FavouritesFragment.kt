@@ -1,10 +1,12 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -62,6 +64,19 @@ class FavouritesFragment : Fragment() {
         rvFavourites.adapter = adapter
 
         getFavourites(view)
+
+        adapter.onCardClick = {
+            Log.d("!!!", it.docID.toString())
+            val placeID = it.docID
+            val action = FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(placeID)
+            if (placeID != null) {
+                Log.d("!!!", placeID.toString())
+                findNavController().navigate(action)
+            }
+//            val fragment = FavouritesDetailsFragment.newInstance(it.docID.toString(),"")
+//            (activity as MainActivity).switchFragment(fragment)
+
+        }
 
         return view
     }

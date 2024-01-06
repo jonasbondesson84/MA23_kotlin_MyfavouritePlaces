@@ -16,8 +16,10 @@
         android:label="fragment_favourites"
         tools:layout="@layout/fragment_favourites" >
         <action
-            android:id="@+id/action_favourites_fragment_to_maps_fragment"
-            app:destination="@id/maps_fragment" />
+            android:id="@+id/action_favourites_fragment_to_favouriteDetailFragment"
+            app:destination="@id/favouriteDetailFragment">
+
+        </action>
     </fragment>
     <fragment
         android:id="@+id/account_fragment"
@@ -44,5 +46,19 @@
         <action
             android:id="@+id/action_loginFragment_to_account_fragment"
             app:destination="@id/account_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/favouriteDetailFragment"
+        android:name="com.example.myfavouriteplaces.FavouriteDetailFragment"
+        android:label="fragment_favourite_detail"
+        tools:layout="@layout/fragment_favourite_detail" >
+        <argument
+            android:name="placeID"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_favouriteDetailFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
     </fragment>
 </navigation>
