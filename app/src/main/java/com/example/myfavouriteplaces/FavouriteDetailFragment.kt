@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.RatingBar
 import android.widget.TextView
@@ -43,9 +42,8 @@ class FavouriteDetailFragment : Fragment() {
     private lateinit var tvCategory: TextView
     private lateinit var rbStar: RatingBar
     private lateinit var btnLocation: ImageButton
-    private lateinit var btnDelete: Button
     private var currentPlace: Place? = null
-    val args: FavouriteDetailFragmentArgs by navArgs()
+    private val args: FavouriteDetailFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +68,6 @@ class FavouriteDetailFragment : Fragment() {
         tvReview = view.findViewById(R.id.tvDetailsReview)
         rbStar = view.findViewById(R.id.rbDetailsStars)
         btnLocation = view.findViewById(R.id.imbDetailsLocation)
-        btnDelete = view.findViewById(R.id.btnDelete)
         val topBarFavourite = view.findViewById<MaterialToolbar>(R.id.topAppBarDetails)
 
         val placeID = args.placeID
@@ -81,6 +78,23 @@ class FavouriteDetailFragment : Fragment() {
         }
 
         hideAllElements()
+
+        btnLocation.setOnClickListener {
+            if(currentPlace != null) {
+                val lat = currentPlace!!.lat?.toFloat()
+                val lng = currentPlace!!.lng?.toFloat()
+                val action = lat?.let { it1 ->
+                    lng?.let { it2->
+                    FavouriteDetailFragmentDirections.actionFavouriteDetailFragmentToMapsFragment(
+                        it1, it2
+                    )
+                }
+            }
+                if (action != null) {
+                    findNavController().navigate(action)
+                }
+            }
+        }
 
 
         topBarFavourite.setOnMenuItemClickListener {menuItem ->

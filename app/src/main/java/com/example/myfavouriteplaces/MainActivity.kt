@@ -79,7 +79,22 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.maps_fragment -> {
-                    navController.navigate(R.id.maps_fragment)
+                    val lat = currentUser.latLng?.latitude?.toFloat()
+                    val lng = currentUser.latLng?.longitude?.toFloat()
+                    val action =
+                        lat?.let {it1->
+                            lng?.let {it2->
+                                HomeFragmentDirections.actionHomeFragmentToMapsFragment(
+                                    it1,
+                                    it2
+                                )
+                            }
+                        }
+                    if (action != null) {
+                        navController.navigate(action)
+                    } else {
+                        navController.navigate(R.id.maps_fragment)
+                    }
                     true
                 }
                 R.id.account_fragment -> {
