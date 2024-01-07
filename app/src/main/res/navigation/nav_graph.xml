@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_favourites_fragment_to_maps_fragment2"
             app:destination="@id/maps_fragment" />
+        <action
+            android:id="@+id/action_favourites_fragment_to_addFavouritePartOneFragment"
+            app:destination="@id/addFavouritePartOneFragment" />
     </fragment>
     <fragment
         android:id="@+id/account_fragment"
@@ -48,11 +51,11 @@
         <argument
             android:name="lat"
             app:argType="float"
-            android:defaultValue="59.334591" />
+            android:defaultValue="0.0" />
         <argument
             android:name="lng"
             app:argType="float"
-            android:defaultValue="18.063240" />
+            android:defaultValue="0.0" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -85,5 +88,38 @@
         <action
             android:id="@+id/action_favouriteDetailFragment_to_maps_fragment"
             app:destination="@id/maps_fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFavouritePartOneFragment"
+        android:name="com.example.myfavouriteplaces.AddFavouritePartOneFragment"
+        android:label="fragment_add_favourite_part_one"
+        tools:layout="@layout/fragment_add_favourite_part_one" >
+        <action
+            android:id="@+id/action_addFavouritePartOneFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
+        <action
+            android:id="@+id/action_addFavouritePartOneFragment_to_addFavouritePartTwoFragment"
+            app:destination="@id/addFavouritePartTwoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFavouritePartTwoFragment"
+        android:name="com.example.myfavouriteplaces.AddFavouritePartTwoFragment"
+        android:label="fragment_add_favourite_part_two"
+        tools:layout="@layout/fragment_add_favourite_part_two" >
+        <action
+            android:id="@+id/action_addFavouritePartTwoFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
+        <action
+            android:id="@+id/action_addFavouritePartTwoFragment_to_addFaouritePartThreeFragment"
+            app:destination="@id/addFaouritePartThreeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFaouritePartThreeFragment"
+        android:name="com.example.myfavouriteplaces.AddFaouritePartThreeFragment"
+        android:label="fragment_add_faourite_part_three"
+        tools:layout="@layout/fragment_add_faourite_part_three" >
+        <action
+            android:id="@+id/action_addFaouritePartThreeFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
     </fragment>
 </navigation>

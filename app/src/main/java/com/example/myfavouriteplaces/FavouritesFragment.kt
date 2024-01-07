@@ -73,9 +73,10 @@ class FavouritesFragment : Fragment() {
                 Log.d("!!!", placeID.toString())
                 findNavController().navigate(action)
             }
-//            val fragment = FavouritesDetailsFragment.newInstance(it.docID.toString(),"")
-//            (activity as MainActivity).switchFragment(fragment)
+        }
 
+        fabAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment)
         }
 
         return view

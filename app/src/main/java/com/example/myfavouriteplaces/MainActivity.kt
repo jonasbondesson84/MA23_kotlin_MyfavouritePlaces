@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_LOCATION)
         }
 
+
         checkIfUserIsLoggedIn()
 
 
@@ -79,20 +80,23 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.maps_fragment -> {
-                    val lat = currentUser.latLng?.latitude?.toFloat()
-                    val lng = currentUser.latLng?.longitude?.toFloat()
-                    val action =
-                        lat?.let {it1->
-                            lng?.let {it2->
-                                HomeFragmentDirections.actionHomeFragmentToMapsFragment(
-                                    it1,
-                                    it2
-                                )
+                    val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+                    if(currentFragment == FavouriteDetailFragment()) {
+                        val lat = currentUser.latLng?.latitude?.toFloat()
+                        val lng = currentUser.latLng?.longitude?.toFloat()
+                        val action =
+                            lat?.let { it1 ->
+                                lng?.let { it2 ->
+                                    HomeFragmentDirections.actionHomeFragmentToMapsFragment(
+                                        it1,
+                                        it2
+                                    )
+                                }
                             }
+                        if (action != null) {
+                            navController.navigate(action)
                         }
-                    if (action != null) {
-                        navController.navigate(action)
-                    } else {
+                    }else {
                         navController.navigate(R.id.maps_fragment)
                     }
                     true
@@ -221,6 +225,11 @@ class MainActivity : AppCompatActivity() {
                 getLastLocation()
             }
         }
+    }
+
+    private fun showMap(fragmentID: Int, ) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(fragmentID, MapsFragment(), "locationMap").commit()
     }
     
 }
