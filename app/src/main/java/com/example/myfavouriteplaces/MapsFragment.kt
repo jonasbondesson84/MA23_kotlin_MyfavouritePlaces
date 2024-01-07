@@ -16,20 +16,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
-//    private val callback = OnMapReadyCallback { googleMap ->
-//        /**
-//         * Manipulates the map once available.
-//         * This callback is triggered when the map is ready to be used.
-//         * This is where we can add markers or lines, add listeners or move the camera.
-//         * In this case, we just add a marker near Sydney, Australia.
-//         * If Google Play services is not installed on the device, the user will be prompted to
-//         * install it inside the SupportMapFragment. This method will only be triggered once the
-//         * user has installed Google Play services and returned to the app.
-//         */
-//        val sydney = LatLng(-34.0, 151.0)
-//        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-//    }
     private val args: MapsFragmentArgs by navArgs()
     private var lat: Double? = null
     private var lng: Double? = null
@@ -42,10 +28,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
 
-        lat = args.lat.toDouble()
-        lng = args.lng.toDouble()
-
-
+        getLatLng()
 
         return view
     }
@@ -54,6 +37,28 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+    }
+
+    private fun getLatLng() {
+
+            lat = args.lat.toDouble()
+            lng = args.lng.toDouble()
+            if (lat == 0.0 || lat == null || lng == null) {
+                lat = currentUser.latLng?.latitude
+                lng = currentUser.latLng?.longitude
+                if (lat == null) {
+                    lat = 59.334591
+                    lng = 18.063240
+                }
+
+            }
+//            if (lng == 0.0 || lng == null) {
+//                lng = currentUser.latLng?.longitude
+//                if (lng == null) {
+//                    lng = 18.063240
+//                }
+//            }
+
     }
 
 

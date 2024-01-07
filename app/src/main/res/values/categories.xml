@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="categories_array">
+        <item>Nature</item>
+        <item>Entertainment</item>
+        <item>Food</item>
+        <item>Shopping</item>
+        <item>History</item>
+        <item>Other</item>
+
+    </string-array>
+
+    <array name="categories_icons">
+        <item>@drawable/baseline_nature_people_24</item>
+        <item>@drawable/baseline_auto_awesome_24</item>
+        <item>@drawable/baseline_food_bank_24</item>
+        <item>@drawable/baseline_shopping_cart_24</item>
+        <item>@drawable/baseline_account_balance_24</item>
+        <item>@drawable/baseline_ballot_24</item>
+    </array>
+
+</resources>
