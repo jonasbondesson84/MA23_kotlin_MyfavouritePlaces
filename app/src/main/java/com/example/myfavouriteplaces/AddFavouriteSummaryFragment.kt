@@ -32,10 +32,8 @@ class AddFavouriteSummaryFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    //private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-//    private lateinit var btnSave: Button
-//    private lateinit var btnCancel: Button
+
     private var _binding: FragmentAddFavouriteSummaryBinding? = null
     val binding get() = _binding!!
 

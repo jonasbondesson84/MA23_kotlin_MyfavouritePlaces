@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -20,6 +21,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private val args: MapsFragmentArgs by navArgs()
     private var lat: Double? = null
     private var lng: Double? = null
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -75,6 +77,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         map.setOnInfoWindowClickListener() {
             val place = it.tag as? Place
             val placeID = place?.docID
+            if (place != null) {
+                sharedViewModel.setPlace(place)
+            }
             val action = MapsFragmentDirections.actionMapsFragmentToFavouriteDetailFragment(placeID)
             if (placeID != null) {
                 Log.d("!!!", placeID.toString())

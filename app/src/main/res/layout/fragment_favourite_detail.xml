@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context=".FavouriteDetailFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.myfavouriteplaces.SharedViewModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -34,7 +37,7 @@
             android:id="@+id/tvDetailsTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="@{viewModel.title}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.515"
             app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="TextView"
+            android:text="@{viewModel.description}"
             app:layout_constraintEnd_toEndOf="@+id/tvDetailsTitle"
             app:layout_constraintStart_toStartOf="@+id/tvDetailsTitle"
             app:layout_constraintTop_toBottomOf="@+id/tvDetailsTitle" />
@@ -54,7 +57,7 @@
             android:id="@+id/tvDetailsCatecory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="@{viewModel.category}"
             app:layout_constraintEnd_toEndOf="@+id/tvDetailsDescription"
             app:layout_constraintStart_toStartOf="@+id/tvDetailsDescription"
             app:layout_constraintTop_toBottomOf="@+id/tvDetailsDescription" />
@@ -70,6 +73,7 @@
 
         <RatingBar
             android:id="@+id/rbDetailsStars"
+            android:rating="@{viewModel.stars}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -80,10 +84,10 @@
             android:id="@+id/tvDetailsReview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:text="@{viewModel.review}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rbDetailsStars" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+</layout>

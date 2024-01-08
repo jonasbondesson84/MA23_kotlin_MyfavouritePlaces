@@ -5,13 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.RatingBar
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.appbar.MaterialToolbar
+import com.example.myfavouriteplaces.databinding.FragmentFavouriteDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
@@ -36,14 +34,18 @@ class FavouriteDetailFragment : Fragment() {
     private var param2: String? = null
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-    private lateinit var tvTitle: TextView
-    private lateinit var tvDesc: TextView
-    private lateinit var tvReview: TextView
-    private lateinit var tvCategory: TextView
-    private lateinit var rbStar: RatingBar
-    private lateinit var btnLocation: ImageButton
+//    private lateinit var tvTitle: TextView
+//    private lateinit var tvDesc: TextView
+//    private lateinit var tvReview: TextView
+//    private lateinit var tvCategory: TextView
+//    private lateinit var rbStar: RatingBar
+//    private lateinit var btnLocation: ImageButton
     private var currentPlace: Place? = null
     private val args: FavouriteDetailFragmentArgs by navArgs()
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+    private var _binding: FragmentFavouriteDetailBinding? = null
+
+    val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,28 +60,28 @@ class FavouriteDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_favourite_detail, container, false)
-
+        //val view = inflater.inflate(R.layout.fragment_favourite_detail, container, false)
+        _binding = FragmentFavouriteDetailBinding.inflate(inflater, container, false)
         db = Firebase.firestore
         auth = Firebase.auth
-        tvTitle = view.findViewById(R.id.tvDetailsTitle)
-        tvDesc = view.findViewById(R.id.tvDetailsDescription)
-        tvCategory = view.findViewById(R.id.tvDetailsCatecory)
-        tvReview = view.findViewById(R.id.tvDetailsReview)
-        rbStar = view.findViewById(R.id.rbDetailsStars)
-        btnLocation = view.findViewById(R.id.imbDetailsLocation)
-        val topBarFavourite = view.findViewById<MaterialToolbar>(R.id.topAppBarDetails)
+//        tvTitle = view.findViewById(R.id.tvDetailsTitle)
+//        tvDesc = view.findViewById(R.id.tvDetailsDescription)
+//        tvCategory = view.findViewById(R.id.tvDetailsCatecory)
+//        tvReview = view.findViewById(R.id.tvDetailsReview)
+//        rbStar = view.findViewById(R.id.rbDetailsStars)
+//        btnLocation = view.findViewById(R.id.imbDetailsLocation)
+        //val topBarFavourite = view.findViewById<MaterialToolbar>(R.id.topAppBarDetails)
 
         val placeID = args.placeID
         if (placeID != null) {
             getPlace(placeID)
         } else {
-            Snackbar.make(view, "Error, favourite place not found.", 2000).show()
+            Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
         }
 
         hideAllElements()
 
-        btnLocation.setOnClickListener {
+        binding.imbDetailsLocation.setOnClickListener {
             if(currentPlace != null) {
                 val lat = currentPlace!!.lat?.toFloat()
                 val lng = currentPlace!!.lng?.toFloat()
@@ -96,11 +98,11 @@ class FavouriteDetailFragment : Fragment() {
             }
         }
 
-        topBarFavourite.setNavigationOnClickListener {
+        binding.topAppBarDetails.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
 
-        topBarFavourite.setOnMenuItemClickListener {menuItem ->
+        binding.topAppBarDetails.setOnMenuItemClickListener {menuItem ->
             when (menuItem.itemId) {
                 R.id.menuSavePlace -> {
                     true
@@ -117,53 +119,67 @@ class FavouriteDetailFragment : Fragment() {
 
         }
 
-        return view
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            viewModel = sharedViewModel
+        }
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun getPlace(placeID: String) {
-        for(place in currentUser.favouritesList) {
-            if(place.docID == placeID) {
-                currentPlace = place
-                showElements(place)
-            }
-        }
-        if(currentPlace == null) {
-            for(place in currentUser.sharedFavouritesList) {
-                if(place.docID == placeID) {
-                    currentPlace = place
-                    showElements(place)
-                }
-            }
-        }
+        currentPlace = sharedViewModel.getPlace()
+        Log.d("!!!", currentPlace!!.description.toString())
+        showElements(currentPlace!!)
+//        for(place in currentUser.favouritesList) {
+//            if(place.docID == placeID) {
+//                currentPlace = place
+//                showElements(place)
+//            }
+//        }
+//        if(currentPlace == null) {
+//            for(place in currentUser.sharedFavouritesList) {
+//                if(place.docID == placeID) {
+//                    currentPlace = place
+//                    showElements(place)
+//                }
+//            }
+//        }
     }
 
     private fun hideAllElements() {
-        tvDesc.visibility = View.INVISIBLE
-        tvCategory.visibility = View.INVISIBLE
-        tvReview.visibility = View.INVISIBLE
-        rbStar.visibility = View.INVISIBLE
+//        tvDesc.visibility = View.INVISIBLE
+//        tvCategory.visibility = View.INVISIBLE
+//        tvReview.visibility = View.INVISIBLE
+//        rbStar.visibility = View.INVISIBLE
     }
 
     private fun showElements(place: Place){
-        tvTitle.text = place.title
-
-        if (place.description != null) {
-            tvDesc.visibility = View.VISIBLE
-            tvDesc.text = place.description
-        }
-        if (place.category != null) {
-            tvCategory.text = place.category
-            tvCategory.visibility = View.VISIBLE
-        }
-        if(place.review != null) {
-            tvReview.text = place.review
-            tvReview.visibility = View.VISIBLE
-        }
-        if(place.stars != null) {
-            rbStar.visibility = View.VISIBLE
-            rbStar.rating = place.stars
-            Log.d("!!!", place.stars.toString())
-        }
+//        tvTitle.text = place.title
+//
+//        if (place.description != null) {
+//            tvDesc.visibility = View.VISIBLE
+//            tvDesc.text = place.description
+//        }
+//        if (place.category != null) {
+//            tvCategory.text = place.category
+//            tvCategory.visibility = View.VISIBLE
+//        }
+//        if(place.review != null) {
+//            tvReview.text = place.review
+//            tvReview.visibility = View.VISIBLE
+//        }
+//        if(place.stars != null) {
+//            rbStar.visibility = View.VISIBLE
+//            rbStar.rating = place.stars
+//            Log.d("!!!", place.stars.toString())
+//        }
 
     }
 

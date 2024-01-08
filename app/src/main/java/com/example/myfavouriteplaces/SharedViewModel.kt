@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 
 class SharedViewModel : ViewModel() {
+    private val _docID = MutableLiveData<String>()
+    val docID: LiveData<String> = _docID
     private val _title = MutableLiveData<String>()
     val title: LiveData<String> = _title
     private val _description = MutableLiveData<String>()
@@ -22,8 +24,41 @@ class SharedViewModel : ViewModel() {
     val lat: LiveData<Double> = _lat
     private val _lng = MutableLiveData<Double>()
     val lng: LiveData<Double> = _lng
+    private val _author = MutableLiveData<String>()
+    val author: LiveData<String> = _author
 
 
+    fun setPlace(place: Place) {
+        val docID = place.docID
+        docID.let { _docID.value = it }
+        val title = place.title
+        title.let { _title.value = it }
+        val desc = place.description
+        desc.let { _description.value = it }
+        val category = place.category
+        category.let { _category.value = it }
+        val lat = place.lat
+        lat.let { _lat.value = it }
+        val lng = place.lng
+        lng.let { _lng.value }
+        val stars = place.stars
+        stars.let { _stars.value = it }
+        val review = place.review
+        review.let { _review.value = it }
+        val sharePublic = place.public
+        sharePublic.let { _sharePublic.value = it }
+        val author = place.author
+        author.let { _author.value = it }
+
+    }
+
+    fun getPlace(): Place {
+
+        return Place(
+            docID.value, title.value, description.value, lat.value, lng.value,
+            category.value, stars.value, review.value, sharePublic.value, author.value
+        )
+    }
 
 
 
