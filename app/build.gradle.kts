@@ -4,6 +4,8 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
     id("androidx.navigation.safeargs.kotlin")
+    id("kotlin-kapt")
+
 }
 
 android {
@@ -20,7 +22,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
-        dataBinding = true
+        android.buildFeatures.dataBinding = true
     }
 
 
@@ -43,6 +45,7 @@ android {
 }
 
 dependencies {
+
 
     //Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")

@@ -5,16 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.myfavouriteplaces.databinding.FragmentAddFavouriteSummaryBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -34,10 +32,13 @@ class AddFavouriteSummaryFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private lateinit var mapView: MapView
+    //private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-    private lateinit var btnSave: Button
-    private lateinit var btnCancel: Button
+//    private lateinit var btnSave: Button
+//    private lateinit var btnCancel: Button
+    private var _binding: FragmentAddFavouriteSummaryBinding? = null
+    val binding get() = _binding!!
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,15 +53,11 @@ class AddFavouriteSummaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_add_favourite_summary, container, false)
+        //val view = inflater.inflate(R.layout.fragment_add_favourite_summary, container, false)
+        _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater,container,false)
 
-        mapView = view.findViewById(R.id.summaryMap)
-        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topSummary)
-        btnSave = view.findViewById(R.id.btnSummarySave)
-        btnCancel = view.findViewById(R.id.btnSummaryCancel)
-
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync {googleMap ->
+        binding.summaryMap.onCreate(savedInstanceState)
+        binding.summaryMap.getMapAsync {googleMap ->
             this.googleMap = googleMap
             val latLng = sharedViewModel.lat.value?.let { sharedViewModel.lng.value?.let { it1 ->
                 LatLng(it,
@@ -77,20 +74,32 @@ class AddFavouriteSummaryFragment : Fragment() {
 
             }
 
-        topAppBar.setNavigationOnClickListener {
+        binding.topSummary.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
 
-        btnCancel.setOnClickListener {
+        binding.btnSummaryCancel.setOnClickListener {
             findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
         }
 
-        btnSave.setOnClickListener {
-            savePlace(view)
+        binding.btnSummarySave.setOnClickListener {
+            savePlace(binding.root)
 
         }
 
-        return view
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            viewModel = sharedViewModel
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun savePlace(view: View) {
