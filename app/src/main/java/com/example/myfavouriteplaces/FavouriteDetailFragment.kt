@@ -96,6 +96,9 @@ class FavouriteDetailFragment : Fragment() {
             }
         }
 
+        topBarFavourite.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
 
         topBarFavourite.setOnMenuItemClickListener {menuItem ->
             when (menuItem.itemId) {
