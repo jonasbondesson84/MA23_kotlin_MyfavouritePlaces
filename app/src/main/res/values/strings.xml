@@ -39,6 +39,10 @@
     <string name="addFavourite">Add Favourite</string>
     <string name="next">Next</string>
     <string name="addLocation">Add Location</string>
+    <string name="addReview">Add Review</string>
+    <string name="skip">Skip</string>
+    <string name="summary">Summary</string>
+    <string name="makePublic">Make public</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

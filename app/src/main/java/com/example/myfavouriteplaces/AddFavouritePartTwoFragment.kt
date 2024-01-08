@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -40,6 +41,7 @@ class AddFavouritePartTwoFragment : Fragment() {
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var btnNext: Button
     private lateinit var btnCancel: Button
+    private lateinit var swPublic: SwitchCompat
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +65,7 @@ class AddFavouritePartTwoFragment : Fragment() {
         topAppBar = view.findViewById(R.id.topAddPartTwo)
         btnCancel = view.findViewById(R.id.btnAddPartTwoCancel)
         btnNext = view.findViewById(R.id.btnAddPartTwoNext)
+        swPublic = view.findViewById(R.id.swPublic)
 
         tvTitle.text = sharedViewModel.title.value.toString()
         mapView.onCreate(savedInstanceState)
@@ -98,6 +101,7 @@ class AddFavouritePartTwoFragment : Fragment() {
 
         btnNext.setOnClickListener {
             if(sharedViewModel.lat.value != null) {
+                sharedViewModel.setSharePublic(swPublic.isChecked)
                 findNavController().navigate(R.id.action_addFavouritePartTwoFragment_to_addFaouritePartThreeFragment)
             }
         }

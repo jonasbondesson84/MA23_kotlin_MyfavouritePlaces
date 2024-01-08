@@ -115,11 +115,26 @@
     </fragment>
     <fragment
         android:id="@+id/addFaouritePartThreeFragment"
-        android:name="com.example.myfavouriteplaces.AddFaouritePartThreeFragment"
+        android:name="com.example.myfavouriteplaces.AddFavouritePartThreeFragment"
         android:label="fragment_add_faourite_part_three"
-        tools:layout="@layout/fragment_add_faourite_part_three" >
+        tools:layout="@layout/fragment_add_favourite_part_three" >
         <action
             android:id="@+id/action_addFaouritePartThreeFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
+        <action
+            android:id="@+id/action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment"
+            app:destination="@id/addFavouriteSummaryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addFavouriteSummaryFragment"
+        android:name="com.example.myfavouriteplaces.AddFavouriteSummaryFragment"
+        android:label="fragment_add_favourite_summary"
+        tools:layout="@layout/fragment_add_favourite_summary" >
+        <action
+            android:id="@+id/action_addFavouriteSummaryFragment_to_favourites_fragment"
+            app:destination="@id/favourites_fragment" />
+        <action
+            android:id="@+id/action_addFavouriteSummaryFragment_to_favourites_fragment2"
             app:destination="@id/favourites_fragment" />
     </fragment>
 </navigation>
