@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,7 @@ class FavouritesFragment : Fragment() {
     private var param2: String? = null
     private lateinit var rvFavourites: RecyclerView
     private lateinit var fabAdd: FloatingActionButton
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -68,6 +70,7 @@ class FavouritesFragment : Fragment() {
         adapter.onCardClick = {
             Log.d("!!!", it.docID.toString())
             val placeID = it.docID
+            sharedViewModel.setPlace(it)
             val action = FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(placeID)
             if (placeID != null) {
                 Log.d("!!!", placeID.toString())
