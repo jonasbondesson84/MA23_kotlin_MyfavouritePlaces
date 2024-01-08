@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,6 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,6 +36,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var googleMap: GoogleMap
+    private lateinit var storage: FirebaseStorage
 
     private var _binding: FragmentAddFavouriteSummaryBinding? = null
     val binding get() = _binding!!
@@ -54,6 +58,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         //val view = inflater.inflate(R.layout.fragment_add_favourite_summary, container, false)
         _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater,container,false)
 
+        storage = Firebase.storage
         binding.summaryMap.onCreate(savedInstanceState)
         binding.summaryMap.getMapAsync {googleMap ->
             this.googleMap = googleMap
@@ -81,7 +86,8 @@ class AddFavouriteSummaryFragment : Fragment() {
         }
 
         binding.btnSummarySave.setOnClickListener {
-            savePlace(binding.root)
+            saveImage(binding.root)
+            //savePlace(binding.root)
 
         }
 
@@ -100,6 +106,37 @@ class AddFavouriteSummaryFragment : Fragment() {
         _binding = null
     }
 
+    private fun saveImage(view:View) {
+        val fileName = "image_${System.currentTimeMillis()}.jpg"
+        val filePath = sharedViewModel.imageUri.value
+        val storageRef = storage.reference.child("images").child(fileName)
+
+        // Upload the image to Firebase Storage
+        filePath?.let { storageRef.putFile(it) }?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    val downloadUrl = uri.toString()
+                    Log.d("MainActivity", "Download URL: $downloadUrl")
+
+                    Toast.makeText(
+                        requireContext(),
+                        "Image uploaded successfully",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    sharedViewModel.setImageURL(downloadUrl)
+                    savePlace(view)
+                    // You can save the downloadUrl or use it to display the image later
+                }
+            } else {
+                // Image upload failed
+                Log.d("!!!", "failed")
+                val exception = task.exception
+                // Handle the exception
+            }
+
+        }
+    }
     private fun savePlace(view: View) {
         val db = Firebase.firestore
         val place = Place(
@@ -111,7 +148,8 @@ class AddFavouriteSummaryFragment : Fragment() {
             public = sharedViewModel.sharePublic.value,
             lat = sharedViewModel.lat.value,
             lng = sharedViewModel.lng.value,
-            author = currentUser.userID
+            author = currentUser.userID,
+            imageURL = sharedViewModel.imageURL.value
 
 
         )

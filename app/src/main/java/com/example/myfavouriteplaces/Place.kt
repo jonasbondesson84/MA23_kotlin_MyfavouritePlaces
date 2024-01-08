@@ -12,4 +12,5 @@ data class Place(@DocumentId var docID: String? = null,
                  val review: String? = null,
                  val public: Boolean? = null,
                  val author: String? = null,
+                 val imageURL: String? = null
 )

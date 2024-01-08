@@ -1,5 +1,6 @@
 package com.example.myfavouriteplaces
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,10 @@ class SharedViewModel : ViewModel() {
     val lng: LiveData<Double> = _lng
     private val _author = MutableLiveData<String>()
     val author: LiveData<String> = _author
+    private val _imageURI = MutableLiveData<Uri>()
+    val imageUri: LiveData<Uri> = _imageURI
+    private val _imageURL = MutableLiveData<String>()
+    val imageURL: LiveData<String> = _imageURL
 
 
     fun setPlace(place: Place) {
@@ -49,18 +54,35 @@ class SharedViewModel : ViewModel() {
         sharePublic.let { _sharePublic.value = it }
         val author = place.author
         author.let { _author.value = it }
+        val imageURL = place.imageURL
+        imageURL.let { _imageURL.value = it }
 
     }
 
     fun getPlace(): Place {
 
         return Place(
-            docID.value, title.value, description.value, lat.value, lng.value,
-            category.value, stars.value, review.value, sharePublic.value, author.value
+            docID = docID.value,
+            title = title.value,
+            description = description.value,
+            lat = lat.value,
+            lng = lng.value,
+            category = category.value,
+            stars = stars.value,
+            review = review.value,
+            public = sharePublic.value,
+            author = author.value,
+            imageURL = imageURL.value
         )
     }
 
+    fun setImageURL(url: String) {
+        _imageURL.value = url
+    }
 
+    fun setImageUri(uri: Uri) {
+        _imageURI.value = uri
+    }
 
     fun setTitle(title: String) {
         _title.value = title
@@ -73,22 +95,23 @@ class SharedViewModel : ViewModel() {
     fun setStars(numberOfStars: Float) {
         _stars.value = numberOfStars
     }
-    fun  setReview(review: String) {
+
+    fun setReview(review: String) {
         _review.value = review
     }
+
     fun setSharePublic(shared: Boolean) {
         _sharePublic.value = shared
     }
+
     fun setLocation(location: LatLng) {
         _lat.value = location.latitude
         _lng.value = location.longitude
     }
+
     fun setCategory(category: String) {
         _category.value = category
     }
-
-
-
 
 
 }

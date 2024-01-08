@@ -1,5 +1,6 @@
 package com.example.myfavouriteplaces
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,11 +10,14 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,6 +40,17 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
     private lateinit var btnCancel: Button
     private lateinit var etvTitle: EditText
     private lateinit var etvDesc: EditText
+    private lateinit var fabAddImage: FloatingActionButton
+    private lateinit var image: ImageView
+
+    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        // Handle the returned Uri
+        Log.d("!!!", "uri = $uri")
+        image.setImageURI(uri)
+        if (uri != null) {
+            sharedViewModel.setImageUri(uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +71,8 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         btnCancel = view.findViewById(R.id.btnAddPartOneCancel)
         etvTitle = view.findViewById(R.id.etvAddTitle)
         etvDesc = view.findViewById(R.id.etvAddDescription)
+        fabAddImage = view.findViewById(R.id.fabAddImage)
+        image = view.findViewById(R.id.imSelectedImage)
 
 
         btnCancel.setOnClickListener {
@@ -67,6 +84,9 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
                 sharedViewModel.setDescription(etvDesc.text.toString())
                 findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_addFavouritePartTwoFragment)
             }
+        }
+        fabAddImage.setOnClickListener {
+            getContent.launch("image/*")
         }
 
         createSpinner()
