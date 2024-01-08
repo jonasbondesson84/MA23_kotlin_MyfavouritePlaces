@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -52,17 +53,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 }
 
             }
-//            if (lng == 0.0 || lng == null) {
-//                lng = currentUser.latLng?.longitude
-//                if (lng == null) {
-//                    lng = 18.063240
-//                }
-//            }
 
     }
 
 
     override fun onMapReady(map: GoogleMap) {
+        val adapter = PlacesInfoAdapter(requireContext())
+        map.setInfoWindowAdapter(adapter)
+
+
         createMarksFavourites(map)
         createMarksShared(map)
         Log.d("!!!", lat.toString() + lng.toString())
@@ -73,6 +72,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             val sthlm = LatLng(59.334591, 18.063240)
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(sthlm, 15f))
         }
+        map.setOnInfoWindowClickListener() {
+            val place = it.tag as? Place
+            val placeID = place?.docID
+            val action = MapsFragmentDirections.actionMapsFragmentToFavouriteDetailFragment(placeID)
+            if (placeID != null) {
+                Log.d("!!!", placeID.toString())
+                findNavController().navigate(action)
+            }
+    }
+
+
+
     }
 
     private fun createMarksFavourites(map: GoogleMap) {
