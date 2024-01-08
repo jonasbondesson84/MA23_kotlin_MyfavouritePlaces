@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     tools:context=".AddFavouriteSummaryFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.myfavouriteplaces.SharedViewModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -46,7 +49,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dividerTop"
-            android:text="@string/title"
+            android:text="@{viewModel.title}"
             />
         <TextView
             android:id="@+id/tvSummaryDescription"
@@ -55,7 +58,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvSummaryTitle"
-            android:text="@string/description"
+            android:text="@{viewModel.description}"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -64,7 +67,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvSummaryDescription"
-            android:text="@string/category"
+            android:text="@{viewModel.category}"
             />
 
         <com.google.android.material.divider.MaterialDivider
@@ -113,6 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:rating="@{viewModel.stars}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dividerTwo" />
@@ -120,7 +124,7 @@
             android:id="@+id/tvSummaryReview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/review"
+            android:text="@{viewModel.review}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rbSummaryStars"
@@ -161,4 +165,4 @@
             app:layout_constraintTop_toBottomOf="@+id/btnSummarySave" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</FrameLayout>
+</layout>
