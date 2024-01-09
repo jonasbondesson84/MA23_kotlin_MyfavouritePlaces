@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -143,7 +144,7 @@ class AccountFragment : Fragment() {
                 .with(this)
                 .load(currentUser.userImage)
                 .placeholder(R.drawable.baseline_image_not_supported_24)
-                .skipMemoryCache(true)//for caching the image url in case phone is offline
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(imAccount)
         }
     }

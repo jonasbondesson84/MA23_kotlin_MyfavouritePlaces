@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.myfavouriteplaces.databinding.FragmentAddFavouritePartOneBinding
 
 // TODO: Rename parameter arguments, choose names that match
@@ -152,7 +153,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
                 .with(this)
                 .load(sharedViewModel.imageURL.value)
                 .placeholder(R.drawable.baseline_image_not_supported_24)
-                .skipMemoryCache(true)//for caching the image url in case phone is offline
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.imSelectedImage)
         }
     }

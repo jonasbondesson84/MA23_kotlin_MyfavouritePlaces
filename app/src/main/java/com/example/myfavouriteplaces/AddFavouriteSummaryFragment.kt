@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.myfavouriteplaces.databinding.FragmentAddFavouriteSummaryBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -106,7 +107,7 @@ class AddFavouriteSummaryFragment : Fragment() {
                 .with(this)
                 .load(sharedViewModel.imageURL.value)
                 .placeholder(R.drawable.baseline_image_not_supported_24)
-                .skipMemoryCache(true)//for caching the image url in case phone is offline
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.imSummaryImage)
         }
     }
