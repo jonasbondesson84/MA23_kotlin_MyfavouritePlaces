@@ -1,6 +1,8 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -33,12 +35,23 @@ class LoginFragment : Fragment() {
     private var param2: String? = null
     private lateinit var btnLogin: Button
     private lateinit var btnSignUp: Button
-    private lateinit var btnContinue: Button
     private lateinit var etvUser: EditText
     private lateinit var etvPassword: EditText
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    private val textWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            val user = etvUser.text.toString()
+            val pw = etvPassword.text.toString()
+            btnLogin.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
+            btnSignUp.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
+        }
+
+        override fun afterTextChanged(s: Editable?) {}
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -55,11 +68,14 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
         btnLogin = view.findViewById(R.id.btnLogin)
         btnSignUp = view.findViewById(R.id.btnSignup)
-        btnContinue = view.findViewById(R.id.btnContinueWithoutLogin)
+
         etvUser = view.findViewById(R.id.etvUser)
         etvPassword = view.findViewById(R.id.etvPassword)
         auth = Firebase.auth
         db = Firebase.firestore
+
+        etvUser.addTextChangedListener(textWatcher)
+        etvPassword.addTextChangedListener(textWatcher)
 
         btnLogin.setOnClickListener {
             signIn(view)
