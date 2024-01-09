@@ -45,6 +45,10 @@
     <string name="makePublic">Make public</string>
     <string name="reviewTitle">Review title</string>
     <string name="savedPlace">Favourite place saved</string>
+    <string name="deleteAccount">Delete Account</string>
+    <string name="deleteAccountDesc">Do you really want to delete your account? This can not be undone.</string>
+    <string name="accountDeleted">Your account has been deleted.</string>
+    <string name="userCollectionDeleted">You collection has been deleted.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

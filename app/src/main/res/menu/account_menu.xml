@@ -7,4 +7,11 @@
         android:title="@string/logout"
         android:contentDescription="@string/account"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/menuDeleteAccount"
+        android:icon="@drawable/baseline_delete_forever_24"
+        android:title="@string/deleteAccount"
+        android:contentDescription="@string/deleteAccount"
+        app:showAsAction="never"
+        />
 </menu>
