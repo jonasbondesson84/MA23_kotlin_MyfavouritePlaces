@@ -49,6 +49,7 @@
     <string name="deleteAccountDesc">Do you really want to delete your account? This can not be undone.</string>
     <string name="accountDeleted">Your account has been deleted.</string>
     <string name="userCollectionDeleted">You collection has been deleted.</string>
+    <string name="accountSaved">Account info saved.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
