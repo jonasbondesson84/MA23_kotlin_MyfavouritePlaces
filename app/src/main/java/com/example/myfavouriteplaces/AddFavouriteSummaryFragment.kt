@@ -59,6 +59,9 @@ class AddFavouriteSummaryFragment : Fragment() {
         _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater,container,false)
 
         storage = Firebase.storage
+        setIcon()
+        hideElements()
+
         binding.summaryMap.onCreate(savedInstanceState)
         binding.summaryMap.getMapAsync {googleMap ->
             this.googleMap = googleMap
@@ -94,6 +97,21 @@ class AddFavouriteSummaryFragment : Fragment() {
         return binding.root
     }
 
+    private fun hideElements() {
+        if(sharedViewModel.imageUri.value == null) {
+            binding.imSummaryImage.setImageResource(R.drawable.border)
+        }
+        if(sharedViewModel.stars.value == null && sharedViewModel.review.value == null) {
+            binding.dividerThree.visibility = View.INVISIBLE
+        }
+        if(sharedViewModel.stars.value == null) {
+            binding.rbSummaryStars.visibility = View.INVISIBLE
+        }
+        if(sharedViewModel.review.value == null) {
+            binding.tvSummaryReview.visibility = View.INVISIBLE
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
@@ -106,35 +124,52 @@ class AddFavouriteSummaryFragment : Fragment() {
         _binding = null
     }
 
+    private fun setIcon() {
+        val iconsArray = resources.obtainTypedArray(R.array.categories_icons)
+        val categoryArray = resources.getStringArray(R.array.categories_array)
+        val categoryIndex = categoryArray.indexOf(sharedViewModel.category.value)
+        if(categoryIndex != -1) {
+            val icon = iconsArray.getResourceId(categoryIndex, -1)
+            binding.imCategory.setImageResource(icon)
+        } else {
+            binding.imCategory.setImageResource(R.drawable.baseline_ballot_24)
+        }
+
+    }
+
     private fun saveImage(view:View) {
-        val fileName = "image_${System.currentTimeMillis()}.jpg"
-        val filePath = sharedViewModel.imageUri.value
-        val storageRef = storage.reference.child("images").child(fileName)
+        if(sharedViewModel.imageUri.value != null) {
+            val fileName = "image_${System.currentTimeMillis()}.jpg"
+            val filePath = sharedViewModel.imageUri.value
+            val storageRef = storage.reference.child("images").child(fileName)
 
-        // Upload the image to Firebase Storage
-        filePath?.let { storageRef.putFile(it) }?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    val downloadUrl = uri.toString()
-                    Log.d("MainActivity", "Download URL: $downloadUrl")
+            // Upload the image to Firebase Storage
+            filePath?.let { storageRef.putFile(it) }?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val downloadUrl = uri.toString()
+                        Log.d("MainActivity", "Download URL: $downloadUrl")
 
-                    Toast.makeText(
-                        requireContext(),
-                        "Image uploaded successfully",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    sharedViewModel.setImageURL(downloadUrl)
-                    savePlace(view)
-                    // You can save the downloadUrl or use it to display the image later
+                        Toast.makeText(
+                            requireContext(),
+                            "Image uploaded successfully",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        sharedViewModel.setImageURL(downloadUrl)
+                        savePlace(view)
+                        // You can save the downloadUrl or use it to display the image later
+                    }
+                } else {
+                    // Image upload failed
+                    Log.d("!!!", "failed")
+                    val exception = task.exception
+                    // Handle the exception
                 }
-            } else {
-                // Image upload failed
-                Log.d("!!!", "failed")
-                val exception = task.exception
-                // Handle the exception
-            }
 
+            }
+        } else {
+            savePlace(view)
         }
     }
     private fun savePlace(view: View) {
@@ -149,7 +184,8 @@ class AddFavouriteSummaryFragment : Fragment() {
             lat = sharedViewModel.lat.value,
             lng = sharedViewModel.lng.value,
             author = currentUser.userID,
-            imageURL = sharedViewModel.imageURL.value
+            imageURL = sharedViewModel.imageURL.value,
+            reviewTitle = sharedViewModel.reviewTitle.value
 
 
         )

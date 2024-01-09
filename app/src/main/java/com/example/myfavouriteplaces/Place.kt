@@ -10,7 +10,9 @@ data class Place(@DocumentId var docID: String? = null,
                  val category: String? = null,
                  val stars: Float? = null,
                  val review: String? = null,
+                 val reviewTitle: String? = null,
                  val public: Boolean? = null,
                  val author: String? = null,
                  val imageURL: String? = null
+
 )
