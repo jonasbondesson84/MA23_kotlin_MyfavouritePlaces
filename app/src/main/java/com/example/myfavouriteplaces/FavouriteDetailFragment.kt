@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.example.myfavouriteplaces.databinding.FragmentFavouriteDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -34,12 +35,6 @@ class FavouriteDetailFragment : Fragment() {
     private var param2: String? = null
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-//    private lateinit var tvTitle: TextView
-//    private lateinit var tvDesc: TextView
-//    private lateinit var tvReview: TextView
-//    private lateinit var tvCategory: TextView
-//    private lateinit var rbStar: RatingBar
-//    private lateinit var btnLocation: ImageButton
     private var currentPlace: Place? = null
     private val args: FavouriteDetailFragmentArgs by navArgs()
     private val sharedViewModel: SharedViewModel by activityViewModels()
@@ -64,13 +59,7 @@ class FavouriteDetailFragment : Fragment() {
         _binding = FragmentFavouriteDetailBinding.inflate(inflater, container, false)
         db = Firebase.firestore
         auth = Firebase.auth
-//        tvTitle = view.findViewById(R.id.tvDetailsTitle)
-//        tvDesc = view.findViewById(R.id.tvDetailsDescription)
-//        tvCategory = view.findViewById(R.id.tvDetailsCatecory)
-//        tvReview = view.findViewById(R.id.tvDetailsReview)
-//        rbStar = view.findViewById(R.id.rbDetailsStars)
-//        btnLocation = view.findViewById(R.id.imbDetailsLocation)
-        //val topBarFavourite = view.findViewById<MaterialToolbar>(R.id.topAppBarDetails)
+
 
         val placeID = args.placeID
         if (placeID != null) {
@@ -79,9 +68,11 @@ class FavouriteDetailFragment : Fragment() {
             Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
         }
 
-        hideAllElements()
+        getImage()
+        setIcon()
 
-        binding.imbDetailsLocation.setOnClickListener {
+        binding.fabGoToMap.setOnClickListener {
+            Log.d("!!!", currentPlace!!.lng.toString())
             if(currentPlace != null) {
                 val lat = currentPlace!!.lat?.toFloat()
                 val lng = currentPlace!!.lng?.toFloat()
@@ -92,6 +83,7 @@ class FavouriteDetailFragment : Fragment() {
                     )
                 }
             }
+                Log.d("!!!", action.toString())
                 if (action != null) {
                     findNavController().navigate(action)
                 }
@@ -121,6 +113,27 @@ class FavouriteDetailFragment : Fragment() {
 
         return binding.root
     }
+    private fun setIcon() {
+        val iconsArray = resources.obtainTypedArray(R.array.categories_icons)
+        val categoryArray = resources.getStringArray(R.array.categories_array)
+        val categoryIndex = categoryArray.indexOf(sharedViewModel.category.value)
+        if(categoryIndex != -1) {
+            val icon = iconsArray.getResourceId(categoryIndex, -1)
+            binding.imDetailsCategory.setImageResource(icon)
+        } else {
+            binding.imDetailsCategory.setImageResource(R.drawable.baseline_ballot_24)
+        }
+
+    }
+
+    private fun getImage() {
+        Glide.with(this)
+            .load(currentPlace?.imageURL.toString())
+            //.apply(requestOptions)
+            .placeholder(R.drawable.baseline_image_not_supported_24)
+            .skipMemoryCache(true)//for caching the image url in case phone is offline
+            .into(binding.imDetailsImage)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -136,50 +149,16 @@ class FavouriteDetailFragment : Fragment() {
     private fun getPlace(placeID: String) {
         currentPlace = sharedViewModel.getPlace()
         Log.d("!!!", currentPlace!!.description.toString())
-        showElements(currentPlace!!)
-//        for(place in currentUser.favouritesList) {
-//            if(place.docID == placeID) {
-//                currentPlace = place
-//                showElements(place)
-//            }
-//        }
-//        if(currentPlace == null) {
-//            for(place in currentUser.sharedFavouritesList) {
-//                if(place.docID == placeID) {
-//                    currentPlace = place
-//                    showElements(place)
-//                }
-//            }
-//        }
-    }
+        currentPlace.let { it->
+            if (it != null) {
+                if(it.reviewTitle.isNullOrEmpty()) {
+                    binding.rbDetailsStars.visibility = View.INVISIBLE
+                }
 
-    private fun hideAllElements() {
-//        tvDesc.visibility = View.INVISIBLE
-//        tvCategory.visibility = View.INVISIBLE
-//        tvReview.visibility = View.INVISIBLE
-//        rbStar.visibility = View.INVISIBLE
-    }
-
-    private fun showElements(place: Place){
-//        tvTitle.text = place.title
-//
-//        if (place.description != null) {
-//            tvDesc.visibility = View.VISIBLE
-//            tvDesc.text = place.description
-//        }
-//        if (place.category != null) {
-//            tvCategory.text = place.category
-//            tvCategory.visibility = View.VISIBLE
-//        }
-//        if(place.review != null) {
-//            tvReview.text = place.review
-//            tvReview.visibility = View.VISIBLE
-//        }
-//        if(place.stars != null) {
-//            rbStar.visibility = View.VISIBLE
-//            rbStar.rating = place.stars
-//            Log.d("!!!", place.stars.toString())
-//        }
+            } else {
+                binding.rbDetailsStars.visibility= View.INVISIBLE
+            }
+        }
 
     }
 

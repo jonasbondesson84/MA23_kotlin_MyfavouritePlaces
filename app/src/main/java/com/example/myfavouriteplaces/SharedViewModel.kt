@@ -19,6 +19,8 @@ class SharedViewModel : ViewModel() {
     val stars: LiveData<Float> = _stars
     private val _review = MutableLiveData<String>()
     val review: LiveData<String> = _review
+    private val _reviewTitle = MutableLiveData<String>()
+    val reviewTitle: LiveData<String> = _reviewTitle
     private val _sharePublic = MutableLiveData<Boolean>()
     val sharePublic: LiveData<Boolean> = _sharePublic
     private val _lat = MutableLiveData<Double>()
@@ -31,6 +33,16 @@ class SharedViewModel : ViewModel() {
     val imageUri: LiveData<Uri> = _imageURI
     private val _imageURL = MutableLiveData<String>()
     val imageURL: LiveData<String> = _imageURL
+    private val _photos = MutableLiveData<List<PlaceImages>>()
+    val photos: LiveData<List<PlaceImages>> = _photos
+
+    init {
+        getPhotos()
+    }
+
+    private fun getPhotos() {
+
+    }
 
 
     fun setPlace(place: Place) {
@@ -45,11 +57,13 @@ class SharedViewModel : ViewModel() {
         val lat = place.lat
         lat.let { _lat.value = it }
         val lng = place.lng
-        lng.let { _lng.value }
+        lng.let { _lng.value = it }
         val stars = place.stars
         stars.let { _stars.value = it }
         val review = place.review
         review.let { _review.value = it }
+        val reviewTitle = place.reviewTitle
+        reviewTitle.let { _reviewTitle.value = it }
         val sharePublic = place.public
         sharePublic.let { _sharePublic.value = it }
         val author = place.author
@@ -70,10 +84,15 @@ class SharedViewModel : ViewModel() {
             category = category.value,
             stars = stars.value,
             review = review.value,
+            reviewTitle = reviewTitle.value,
             public = sharePublic.value,
             author = author.value,
             imageURL = imageURL.value
         )
+    }
+
+    fun setReviewTitle(reviewTitle: String) {
+        _reviewTitle.value = reviewTitle
     }
 
     fun setImageURL(url: String) {
@@ -112,6 +131,8 @@ class SharedViewModel : ViewModel() {
     fun setCategory(category: String) {
         _category.value = category
     }
+
+
 
 
 }

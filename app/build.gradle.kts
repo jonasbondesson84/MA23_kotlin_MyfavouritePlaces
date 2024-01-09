@@ -46,6 +46,11 @@ android {
 
 dependencies {
 
+    //Download Images
+    implementation("io.coil-kt:coil:1.1.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:recyclerview-integration:4.14.2")
+
 
     //Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")

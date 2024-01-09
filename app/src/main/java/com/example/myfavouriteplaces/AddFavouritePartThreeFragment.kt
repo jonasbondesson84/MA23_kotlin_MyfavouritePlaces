@@ -1,16 +1,15 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RatingBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.appbar.MaterialToolbar
+import com.example.myfavouriteplaces.databinding.FragmentAddFavouritePartThreeBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,8 +26,21 @@ class AddFavouritePartThreeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private lateinit var etvReview: EditText
-    private lateinit var rbStars: RatingBar
+//    private lateinit var etvReview: EditText
+//    private lateinit var rbStars: RatingBar
+    private var _binding: FragmentAddFavouritePartThreeBinding? = null
+    val binding get() = _binding!!
+    private val textWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            val title = binding.etvAddReview.text.toString()
+            binding.btnAddPartThreeNext.isEnabled = title.isNotEmpty()
+        }
+
+        override fun afterTextChanged(s: Editable?) {}
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,35 +55,55 @@ class AddFavouritePartThreeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_add_favourite_part_three, container, false)
+        //val view = inflater.inflate(R.layout.fragment_add_favourite_part_three, container, false)
+        _binding = FragmentAddFavouritePartThreeBinding.inflate(inflater,container,false)
+//        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAddPartThree)
+//        val btnCancel = view.findViewById<Button>(R.id.btnAddPartThreeCancel)
+//        val btnNext = view.findViewById<Button>(R.id.btnAddPartThreeNext)
+//        val btnSkip = view.findViewById<Button>(R.id.btnAddSkipReview)
+//        etvReview = view.findViewById(R.id.etvAddReview)
+//        rbStars = view.findViewById(R.id.rbAddStars)
+        binding.etvAddReview.addTextChangedListener(textWatcher)
 
-        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAddPartThree)
-        val btnCancel = view.findViewById<Button>(R.id.btnAddPartThreeCancel)
-        val btnNext = view.findViewById<Button>(R.id.btnAddPartThreeNext)
-        val btnSkip = view.findViewById<Button>(R.id.btnAddSkipReview)
-        etvReview = view.findViewById(R.id.etvAddReview)
-        rbStars = view.findViewById(R.id.rbAddStars)
-
-        topAppBar.setNavigationOnClickListener {
+        binding.topAddPartThree.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
 
-        btnCancel.setOnClickListener {
+        binding.rbAddStars.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
+            sharedViewModel.setStars(binding.rbAddStars.rating)
+        }
+
+
+        binding.btnAddPartThreeCancel.setOnClickListener {
             findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_favourites_fragment)
         }
 
-        btnNext.setOnClickListener {
-            if(etvReview.text.isNotEmpty()) {
-                sharedViewModel.setReview(etvReview.text.toString())
-                sharedViewModel.setStars(rbStars.rating)
+        binding.btnAddPartThreeNext.setOnClickListener {
+            if(binding.etvAddReview.text.isNotEmpty()) {
+                sharedViewModel.setReview(binding.etvAddReview.text.toString())
+                sharedViewModel.setReviewTitle(binding.etvAddReviewTitle.text.toString())
+                sharedViewModel.setStars(binding.rbAddStars.rating)
+
                 findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment)
             }
         }
-        btnSkip.setOnClickListener {
+        binding.btnAddSkipReview.setOnClickListener {
+
             findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment)
         }
 
-        return view
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            viewModel = sharedViewModel
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

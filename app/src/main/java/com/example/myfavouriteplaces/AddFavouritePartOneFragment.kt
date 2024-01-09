@@ -2,22 +2,19 @@ package com.example.myfavouriteplaces
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Spinner
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.example.myfavouriteplaces.databinding.FragmentAddFavouritePartOneBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,22 +32,29 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
     private var param1: String? = null
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private lateinit var spCategory: Spinner
-    private lateinit var btnNext: Button
-    private lateinit var btnCancel: Button
-    private lateinit var etvTitle: EditText
-    private lateinit var etvDesc: EditText
-    private lateinit var fabAddImage: FloatingActionButton
-    private lateinit var image: ImageView
+
+    private val textWatcher = object : TextWatcher {
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        val title = binding.etvAddTitle.text.toString()
+        binding.btnAddPartOneNext.isEnabled = title.isNotEmpty()
+    }
+
+    override fun afterTextChanged(s: Editable?) {}
+
+}
 
     val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
         Log.d("!!!", "uri = $uri")
-        image.setImageURI(uri)
+        binding.imSelectedImage.setImageURI(uri)
         if (uri != null) {
             sharedViewModel.setImageUri(uri)
         }
     }
+    private var _binding: FragmentAddFavouritePartOneBinding? = null
+    val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,40 +69,54 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_add_favourite_part_one, container, false)
-        spCategory = view.findViewById(R.id.spCategory)
-        btnNext = view.findViewById(R.id.btnAddPartOneNext)
-        btnCancel = view.findViewById(R.id.btnAddPartOneCancel)
-        etvTitle = view.findViewById(R.id.etvAddTitle)
-        etvDesc = view.findViewById(R.id.etvAddDescription)
-        fabAddImage = view.findViewById(R.id.fabAddImage)
-        image = view.findViewById(R.id.imSelectedImage)
+        //val view = inflater.inflate(R.layout.fragment_add_favourite_part_one, container, false)
+        _binding = FragmentAddFavouritePartOneBinding.inflate(inflater,container,false)
+//        spCategory = view.findViewById(R.id.spCategory)
+//        btnNext = view.findViewById(R.id.btnAddPartOneNext)
+//        btnCancel = view.findViewById(R.id.btnAddPartOneCancel)
+//        etvTitle = view.findViewById(R.id.etvAddTitle)
+//        etvDesc = view.findViewById(R.id.etvAddDescription)
+//        fabAddImage = view.findViewById(R.id.fabAddImage)
+//        image = view.findViewById(R.id.imSelectedImage)
+
+        binding.etvAddTitle.addTextChangedListener(textWatcher)
 
 
-        btnCancel.setOnClickListener {
+        binding.btnAddPartOneCancel.setOnClickListener {
             findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_favourites_fragment)
         }
-        btnNext.setOnClickListener {
-            if (etvTitle.text.isNotEmpty()) {
-                sharedViewModel.setTitle(etvTitle.text.toString())
-                sharedViewModel.setDescription(etvDesc.text.toString())
+        binding.btnAddPartOneNext.setOnClickListener {
+            if (binding.etvAddTitle.text.isNotEmpty()) {
+                sharedViewModel.setTitle(binding.etvAddTitle.text.toString())
+                sharedViewModel.setDescription(binding.etvAddDescription.text.toString())
                 findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_addFavouritePartTwoFragment)
             }
         }
-        fabAddImage.setOnClickListener {
+        binding.fabAddImage.setOnClickListener {
             getContent.launch("image/*")
         }
 
         createSpinner()
 
-        val topAddFavBar = view.findViewById<MaterialToolbar>(R.id.topAddPart1)
+       // val topAddFavBar = view.findViewById<MaterialToolbar>(R.id.topAddPart1)
 
-        topAddFavBar.setNavigationOnClickListener {
+        binding.topAddPart1.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
 
-        spCategory.onItemSelectedListener = this
-        return view
+        binding.spCategory.onItemSelectedListener = this
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            viewModel = sharedViewModel
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
@@ -129,7 +147,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
             // Specify the layout to use when the list of choices appears.
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner.
-            spCategory.adapter = adapter
+            binding.spCategory.adapter = adapter
         }
     }
 
