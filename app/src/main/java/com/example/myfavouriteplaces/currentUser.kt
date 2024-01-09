@@ -16,12 +16,19 @@ object currentUser {
 
 
     fun resetUser() {
-        documentId = null
-        userID = null
-        name = null
-        location = null
-        userImage = null
-        favouritesList.clear()
+        this.documentId = null
+        this.userID = null
+        this.name = null
+        this.location = null
+        this.userImage = null
+        this.favouritesList.clear()
+    }
+
+    fun updateUser(name: String?, location: String?, userImage: String?) {
+        this.name = name
+        this.location = location
+        this.userImage = userImage
+
     }
 
 }

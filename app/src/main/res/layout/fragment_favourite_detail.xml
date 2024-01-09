@@ -144,6 +144,7 @@
                 android:layout_marginTop="8dp"
                 />
             <TextView
+                android:id="@+id/tvDetailsReview"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:lines="5"
@@ -155,6 +156,25 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="8dp"
+                />
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:id="@+id/imAuthor"
+                app:layout_constraintTop_toBottomOf="@+id/tvDetailsReview"
+                app:layout_constraintEnd_toStartOf="@id/tvAuthor"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="16dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvAuthor"
+                app:layout_constraintTop_toTopOf="@id/imAuthor"
+                app:layout_constraintBottom_toBottomOf="@+id/imAuthor"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
                 />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

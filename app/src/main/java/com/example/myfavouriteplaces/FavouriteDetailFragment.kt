@@ -10,6 +10,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.Rotate
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.example.myfavouriteplaces.databinding.FragmentFavouriteDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -73,6 +77,7 @@ class FavouriteDetailFragment : Fragment() {
 
         getImage()
         setIcon()
+        setAuthorDetails()
 
         binding.fabGoToMap.setOnClickListener {
             Log.d("!!!", currentPlace!!.lng.toString())
@@ -121,6 +126,31 @@ class FavouriteDetailFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun setAuthorDetails() {
+        val authorID = sharedViewModel.author.value
+        if (authorID != null) {
+            db.collection("usersCollection").whereEqualTo("userID", authorID).get()
+                .addOnSuccessListener {document->
+                    val authorName = document.documents[0].data?.get("name").toString()
+                    val authorImage = document.documents[0].data?.get("userImage").toString()
+
+                    if(document != null) {
+                        binding.tvAuthor.text = authorName
+                        var requestOptions = RequestOptions()
+                        requestOptions = requestOptions.transforms(CenterCrop(), RoundedCorners(50), Rotate(270))
+                        Glide.with(this)
+                            .load(authorImage)
+                            .apply(requestOptions)
+                            .placeholder(R.drawable.baseline_image_not_supported_24)
+                            .skipMemoryCache(true)//for caching the image url in case phone is offline
+                            .into(binding.imAuthor)
+//
+                    }
+
+                }
+        }
     }
 
     private fun editPlace() {
