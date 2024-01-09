@@ -39,6 +39,7 @@ class FavouriteDetailFragment : Fragment() {
     private val args: FavouriteDetailFragmentArgs by navArgs()
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private var _binding: FragmentFavouriteDetailBinding? = null
+    private var isSavable = true
 
     val binding get() = _binding!!
 
@@ -67,6 +68,7 @@ class FavouriteDetailFragment : Fragment() {
         } else {
             Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
         }
+        hideSaveIcon()
 
         getImage()
         setIcon()
@@ -97,6 +99,9 @@ class FavouriteDetailFragment : Fragment() {
         binding.topAppBarDetails.setOnMenuItemClickListener {menuItem ->
             when (menuItem.itemId) {
                 R.id.menuSavePlace -> {
+                    if(isSavable) {
+                        saveShared()
+                    }
                     true
                 }
                 R.id.menuEditFavourite -> {
@@ -113,6 +118,29 @@ class FavouriteDetailFragment : Fragment() {
 
         return binding.root
     }
+
+    private fun hideSaveIcon() {
+            if(currentPlace?.author == currentUser.userID) {
+                val icon = binding.topAppBarDetails.menu.getItem(0)
+                icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
+                isSavable = false
+            }
+    }
+
+    private fun saveShared() {
+        val savePlace = sharedViewModel.getPlace()
+        db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(savePlace)
+            .addOnCompleteListener {task ->
+                if(task.isSuccessful) {
+                    Snackbar.make(binding.root, getString(R.string.savedPlace), 2000).show()
+                    val icon = binding.topAppBarDetails.menu.getItem(0)
+                    icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
+                } else {
+                    Snackbar.make(binding.root, "Error", 2000).show()
+                }
+            }
+    }
+
     private fun setIcon() {
         val iconsArray = resources.obtainTypedArray(R.array.categories_icons)
         val categoryArray = resources.getStringArray(R.array.categories_array)
