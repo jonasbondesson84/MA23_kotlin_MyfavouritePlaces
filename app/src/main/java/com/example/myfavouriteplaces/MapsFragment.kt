@@ -15,6 +15,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.appbar.MaterialToolbar
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -22,6 +23,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private var lat: Double? = null
     private var lng: Double? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
+    private lateinit var topAppBar: MaterialToolbar
 
 
     override fun onCreateView(
@@ -30,6 +32,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
+        topAppBar = view.findViewById(R.id.topAppMaps)
+
+        topAppBar.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
 
         getLatLng()
 
