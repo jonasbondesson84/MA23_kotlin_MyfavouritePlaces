@@ -88,7 +88,7 @@ class AddFavouritePartThreeFragment : Fragment() {
             }
         }
         binding.btnAddSkipReview.setOnClickListener {
-
+            sharedViewModel.resetReview()
             findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment)
         }
 

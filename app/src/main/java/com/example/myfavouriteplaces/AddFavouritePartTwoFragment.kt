@@ -73,9 +73,14 @@ class AddFavouritePartTwoFragment : Fragment() {
             if( latLng == null) {
                 latLng = LatLng(59.334591, 18.063240)
             }
+            var marker: Marker? = null
+            if(sharedViewModel.lat.value != null && sharedViewModel.lng.value != null) {
+                latLng = LatLng(sharedViewModel.lat.value!!, sharedViewModel.lng.value!!)
+                marker = googleMap.addMarker(MarkerOptions().position(latLng))
+                binding.btnAddPartTwoNext.isEnabled = true
+            }
             val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15f)
             googleMap.moveCamera(cameraUpdate)
-            var marker: Marker? = null
 
             googleMap.setOnMapClickListener {latLng ->
                 marker?.remove()
@@ -104,11 +109,10 @@ class AddFavouritePartTwoFragment : Fragment() {
             }
         }
 
-
-
-
+        setSwitchIfEdit()
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
@@ -139,6 +143,11 @@ class AddFavouritePartTwoFragment : Fragment() {
     override fun onLowMemory() {
         super.onLowMemory()
         binding.addLocationMap.onLowMemory()
+    }
+
+    private fun setSwitchIfEdit(){
+        if(sharedViewModel.sharePublic.value != null)
+            binding.swPublic.isChecked = sharedViewModel.sharePublic.value!!
     }
 
 
