@@ -82,7 +82,7 @@ class LoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    getCurrentUserInfo()
+                    auth.currentUser?.let { (activity as MainActivity).getUserDetails(it) }//getCurrentUserInfo()
                     findNavController().navigate(R.id.action_loginFragment_to_home_fragment)
 //                    (activity as MainActivity).switchFragment(StartFragment())
                 } else {
@@ -105,7 +105,11 @@ class LoginFragment : Fragment() {
                         db.collection("usersCollection").add(user)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    getCurrentUserInfo()
+                                    auth.currentUser?.let { it1 ->
+                                        (activity as MainActivity).getUserDetails(
+                                            it1
+                                        )
+                                    }
                                     findNavController().navigate(R.id.action_loginFragment_to_account_fragment)
                                     //(activity as MainActivity).switchFragment(StartFragment())
                                 } else {
@@ -142,8 +146,6 @@ class LoginFragment : Fragment() {
             }
         }
 
-
-        //currentUser.name =
 
     }
 

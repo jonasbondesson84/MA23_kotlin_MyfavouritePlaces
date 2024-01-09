@@ -64,7 +64,7 @@ class FavouritesFragment : Fragment() {
         rvFavourites.layoutManager = LinearLayoutManager(view.context)
         adapter = FavouritesAdapter(view.context, currentUser.favouritesList)
         rvFavourites.adapter = adapter
-
+        sharedViewModel.resetValues()
         getFavourites(view)
 
         adapter.onCardClick = {

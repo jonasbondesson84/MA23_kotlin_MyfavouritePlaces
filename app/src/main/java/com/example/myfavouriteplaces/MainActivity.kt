@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getUserDetails(user: FirebaseUser) {
+    fun getUserDetails(user: FirebaseUser) {
         db.collection("usersCollection").get().addOnSuccessListener {documentSnapshot ->
             for(document in documentSnapshot) {
                 if(document.get("userID").toString() == user.uid) {
