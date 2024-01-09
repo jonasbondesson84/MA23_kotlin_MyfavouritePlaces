@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.myfavouriteplaces.databinding.FragmentAddFavouriteSummaryBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -60,6 +61,7 @@ class AddFavouriteSummaryFragment : Fragment() {
 
         storage = Firebase.storage
         setIcon()
+        getImageIfEdited()
         hideElements()
 
         binding.summaryMap.onCreate(savedInstanceState)
@@ -89,13 +91,26 @@ class AddFavouriteSummaryFragment : Fragment() {
         }
 
         binding.btnSummarySave.setOnClickListener {
+            Log.d("!!!", sharedViewModel.docID.value.toString())
             saveImage(binding.root)
-            //savePlace(binding.root)
+
 
         }
 
         return binding.root
     }
+
+    private fun getImageIfEdited() {
+        if(sharedViewModel.imageUri.value == null) {
+            Glide
+                .with(this)
+                .load(sharedViewModel.imageURL.value)
+                .placeholder(R.drawable.baseline_image_not_supported_24)
+                .skipMemoryCache(true)//for caching the image url in case phone is offline
+                .into(binding.imSummaryImage)
+        }
+    }
+
 
     private fun hideElements() {
         if(sharedViewModel.imageUri.value == null) {
@@ -138,7 +153,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     }
 
     private fun saveImage(view:View) {
-        if(sharedViewModel.imageUri.value != null) {
+        if(sharedViewModel.imageUri.value != null) { //If you have selected an image, if first saves the image to firebase.storage, then saves the post in firebase
             val fileName = "image_${System.currentTimeMillis()}.jpg"
             val filePath = sharedViewModel.imageUri.value
             val storageRef = storage.reference.child("images").child(fileName)
@@ -157,7 +172,11 @@ class AddFavouriteSummaryFragment : Fragment() {
                         )
                             .show()
                         sharedViewModel.setImageURL(downloadUrl)
-                        savePlace(view)
+                        if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
+                            editPost(binding.root)
+                        } else {  //if it is a new post, it saves a new
+                            savePlace(binding.root)
+                        }
                         // You can save the downloadUrl or use it to display the image later
                     }
                 } else {
@@ -168,8 +187,12 @@ class AddFavouriteSummaryFragment : Fragment() {
                 }
 
             }
-        } else {
-            savePlace(view)
+        } else { //if you havent selected an image you just saves the place to firebase
+            if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
+                editPost(binding.root)
+            } else {  //if it is a new post, it saves a new
+                savePlace(binding.root)
+            }
         }
     }
     private fun savePlace(view: View) {
@@ -198,6 +221,48 @@ class AddFavouriteSummaryFragment : Fragment() {
                     Snackbar.make(view, "Error", 2000).show()
                 }
             }
+    }
+
+    private fun editPost(view: View) {
+        val db = Firebase.firestore
+        val place = Place(
+            title = sharedViewModel.title.value,
+            description = sharedViewModel.description.value,
+            category = sharedViewModel.category.value,
+            stars = sharedViewModel.stars.value,
+            review = sharedViewModel.review.value,
+            public = sharedViewModel.sharePublic.value,
+            lat = sharedViewModel.lat.value,
+            lng = sharedViewModel.lng.value,
+            author = currentUser.userID,
+            imageURL = sharedViewModel.imageURL.value,
+            reviewTitle = sharedViewModel.reviewTitle.value
+
+
+        )
+        sharedViewModel.docID.value?.let {
+            db.collection("users").document(currentUser.userID.toString()).collection("favourites").document(
+                it
+            ).update("title", place.title,
+                "description", place.description,
+                "category", place.category,
+                "stars", place.stars,
+                "review", place.review,
+                "public", place.public,
+                "lat", place.lat,
+                "lng", place.lng,
+                "imageURL", place.imageURL,
+                "reviewTitle", place.reviewTitle)
+                .addOnCompleteListener {task ->
+                    if(task.isSuccessful) {
+                        findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
+                        //(activity as MainActivity).switchFragment(FavouriteFragment())
+                    } else {
+                        Snackbar.make(view, "Error", 2000).show()
+                    }
+                }
+        }
+
     }
 
     companion object {

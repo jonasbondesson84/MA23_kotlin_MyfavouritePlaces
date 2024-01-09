@@ -40,7 +40,8 @@
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+            android:text="@{viewModel.title}"/>
 
         <EditText
             android:id="@+id/etvAddDescription"
@@ -52,7 +53,8 @@
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etvAddTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/etvAddTitle"
+            android:text="@{viewModel.description}"/>
 
         <Spinner
             android:id="@+id/spCategory"
@@ -61,7 +63,8 @@
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etvAddDescription" />
+            app:layout_constraintTop_toBottomOf="@+id/etvAddDescription"
+            />
 
         <ImageView
             android:layout_width="0dp"

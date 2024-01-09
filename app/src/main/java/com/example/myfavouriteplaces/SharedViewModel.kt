@@ -7,34 +7,34 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 
 class SharedViewModel : ViewModel() {
-    private val _docID = MutableLiveData<String>()
-    val docID: LiveData<String> = _docID
-    private val _title = MutableLiveData<String>()
-    val title: LiveData<String> = _title
-    private val _description = MutableLiveData<String>()
-    val description: LiveData<String> = _description
-    private val _category = MutableLiveData<String>()
-    val category: LiveData<String> = _category
-    private val _stars = MutableLiveData<Float>()
-    val stars: LiveData<Float> = _stars
-    private val _review = MutableLiveData<String>()
-    val review: LiveData<String> = _review
-    private val _reviewTitle = MutableLiveData<String>()
-    val reviewTitle: LiveData<String> = _reviewTitle
-    private val _sharePublic = MutableLiveData<Boolean>()
-    val sharePublic: LiveData<Boolean> = _sharePublic
-    private val _lat = MutableLiveData<Double>()
-    val lat: LiveData<Double> = _lat
-    private val _lng = MutableLiveData<Double>()
-    val lng: LiveData<Double> = _lng
-    private val _author = MutableLiveData<String>()
-    val author: LiveData<String> = _author
-    private val _imageURI = MutableLiveData<Uri>()
-    val imageUri: LiveData<Uri> = _imageURI
-    private val _imageURL = MutableLiveData<String>()
-    val imageURL: LiveData<String> = _imageURL
-    private val _photos = MutableLiveData<List<PlaceImages>>()
-    val photos: LiveData<List<PlaceImages>> = _photos
+    private val _docID = MutableLiveData<String?>()
+    val docID: LiveData<String?> = _docID
+    private val _title = MutableLiveData<String?>()
+    val title: MutableLiveData<String?> = _title
+    private val _description = MutableLiveData<String?>()
+    val description: MutableLiveData<String?> = _description
+    private val _category = MutableLiveData<String?>()
+    val category: MutableLiveData<String?> = _category
+    private val _stars = MutableLiveData<Float?>()
+    val stars: MutableLiveData<Float?> = _stars
+    private val _review = MutableLiveData<String?>()
+    val review: MutableLiveData<String?> = _review
+    private val _reviewTitle = MutableLiveData<String?>()
+    val reviewTitle: MutableLiveData<String?> = _reviewTitle
+    private val _sharePublic = MutableLiveData<Boolean?>()
+    val sharePublic: MutableLiveData<Boolean?> = _sharePublic
+    private val _lat = MutableLiveData<Double?>()
+    val lat: MutableLiveData<Double?> = _lat
+    private val _lng = MutableLiveData<Double?>()
+    val lng: MutableLiveData<Double?> = _lng
+    private val _author = MutableLiveData<String?>()
+    val author: MutableLiveData<String?> = _author
+    private val _imageURI = MutableLiveData<Uri?>()
+    val imageUri: MutableLiveData<Uri?> = _imageURI
+    private val _imageURL = MutableLiveData<String?>()
+    val imageURL: MutableLiveData<String?> = _imageURL
+    private val _photos = MutableLiveData<List<PlaceImages>?>()
+    val photos: MutableLiveData<List<PlaceImages>?> = _photos
 
     init {
         getPhotos()
@@ -43,34 +43,42 @@ class SharedViewModel : ViewModel() {
     private fun getPhotos() {
 
     }
+    fun resetValues() {
+        _docID.value = null
+        _title.value = null
+        _description.value = null
+        _category.value = null
+        _lat.value = null
+        _lng.value = null
+        _stars.value = null
+        _review.value = null
+        _reviewTitle.value = null
+        _sharePublic.value = null
+        _author.value = null
+        _imageURI.value = null
+        _imageURL.value = null
+        _photos.value = null
+    }
 
+    fun resetReview() {
+        _stars.value = null
+        _reviewTitle.value = null
+        _review.value = null
+    }
 
     fun setPlace(place: Place) {
-        val docID = place.docID
-        docID.let { _docID.value = it }
-        val title = place.title
-        title.let { _title.value = it }
-        val desc = place.description
-        desc.let { _description.value = it }
-        val category = place.category
-        category.let { _category.value = it }
-        val lat = place.lat
-        lat.let { _lat.value = it }
-        val lng = place.lng
-        lng.let { _lng.value = it }
-        val stars = place.stars
-        stars.let { _stars.value = it }
-        val review = place.review
-        review.let { _review.value = it }
-        val reviewTitle = place.reviewTitle
-        reviewTitle.let { _reviewTitle.value = it }
-        val sharePublic = place.public
-        sharePublic.let { _sharePublic.value = it }
-        val author = place.author
-        author.let { _author.value = it }
-        val imageURL = place.imageURL
-        imageURL.let { _imageURL.value = it }
-
+        _docID.value = place.docID
+        _title.value = place.title
+        _description.value = place.description
+        _category.value = place.category
+        _lat.value = place.lat
+        _lng.value = place.lng
+        _stars.value = place.stars
+        _review.value = place.review
+        _reviewTitle.value = place.reviewTitle
+        _sharePublic.value = place.public
+        _author.value = place.author
+        _imageURL.value = place.imageURL
     }
 
     fun getPlace(): Place {

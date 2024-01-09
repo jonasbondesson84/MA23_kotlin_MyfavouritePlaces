@@ -49,7 +49,8 @@
             tools:layout_editor_absoluteY="265dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvAddReview"/>
+            app:layout_constraintTop_toBottomOf="@+id/tvAddReview"
+            android:rating="@{viewModel.stars}"/>
 
         <EditText
             android:layout_width="0dp"
@@ -62,6 +63,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rbAddStars"
             android:layout_marginTop="8dp"
+            android:text="@{viewModel.reviewTitle}"
             />
 
         <EditText
@@ -78,6 +80,7 @@
             android:hint="@string/review"
             android:inputType="textMultiLine"
             android:layout_marginTop="8dp"
+            android:text="@{viewModel.review}"
             />
 
         <com.google.android.material.divider.MaterialDivider

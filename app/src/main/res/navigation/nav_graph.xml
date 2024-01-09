@@ -91,6 +91,9 @@
         <action
             android:id="@+id/action_favouriteDetailFragment_to_maps_fragment"
             app:destination="@id/maps_fragment" />
+        <action
+            android:id="@+id/action_favouriteDetailFragment_to_addFavouritePartOneFragment"
+            app:destination="@id/addFavouritePartOneFragment" />
     </fragment>
     <fragment
         android:id="@+id/addFavouritePartOneFragment"

@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.myfavouriteplaces.databinding.FragmentAddFavouritePartOneBinding
 
 // TODO: Rename parameter arguments, choose names that match
@@ -71,16 +72,8 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         // Inflate the layout for this fragment
         //val view = inflater.inflate(R.layout.fragment_add_favourite_part_one, container, false)
         _binding = FragmentAddFavouritePartOneBinding.inflate(inflater,container,false)
-//        spCategory = view.findViewById(R.id.spCategory)
-//        btnNext = view.findViewById(R.id.btnAddPartOneNext)
-//        btnCancel = view.findViewById(R.id.btnAddPartOneCancel)
-//        etvTitle = view.findViewById(R.id.etvAddTitle)
-//        etvDesc = view.findViewById(R.id.etvAddDescription)
-//        fabAddImage = view.findViewById(R.id.fabAddImage)
-//        image = view.findViewById(R.id.imSelectedImage)
 
         binding.etvAddTitle.addTextChangedListener(textWatcher)
-
 
         binding.btnAddPartOneCancel.setOnClickListener {
             findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_favourites_fragment)
@@ -97,8 +90,8 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         }
 
         createSpinner()
+        getImageIfEdit()
 
-       // val topAddFavBar = view.findViewById<MaterialToolbar>(R.id.topAddPart1)
 
         binding.topAddPart1.setNavigationOnClickListener {
             activity?.onBackPressed()
@@ -148,7 +141,24 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner.
             binding.spCategory.adapter = adapter
+            if(sharedViewModel.category.value != null) {
+                binding.spCategory.setSelection(adapter.getPosition(sharedViewModel.category.value))
+            }
         }
+    }
+    private fun getImageIfEdit() {
+        if(sharedViewModel.imageURL.value != null) {
+            Glide
+                .with(this)
+                .load(sharedViewModel.imageURL.value)
+                .placeholder(R.drawable.baseline_image_not_supported_24)
+                .skipMemoryCache(true)//for caching the image url in case phone is offline
+                .into(binding.imSelectedImage)
+        }
+    }
+
+    private fun setSpinnerIfEdit() {
+
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
