@@ -104,7 +104,8 @@ class FavouritesFragment : Fragment() {
         fabAdd.setOnClickListener {
 
             sharedViewModel.resetValues()
-            findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment)
+            val extras = FragmentNavigatorExtras(fabAdd to "fabToScreen")
+            findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment, null, null, extras)
         }
 
         return view

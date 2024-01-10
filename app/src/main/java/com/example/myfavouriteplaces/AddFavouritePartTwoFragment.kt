@@ -93,7 +93,8 @@ class AddFavouritePartTwoFragment : Fragment() {
         }
 
         binding.topAddPartTwo.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            findNavController().navigateUp()
+        //findNavController().navigate(R.id.action_addFavouritePartTwoFragment_to_addFavouritePartOneFragment)
         }
 
 
@@ -136,7 +137,7 @@ class AddFavouritePartTwoFragment : Fragment() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        binding.addLocationMap.onDestroy()
+        //binding.addLocationMap.onDestroy()
     }
 
     override fun onLowMemory() {

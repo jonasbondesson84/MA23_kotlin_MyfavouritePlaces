@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,6 +64,8 @@ class AccountFragment : Fragment() {
     private var imageUri: Uri? = null
     private var imageBitmap: Bitmap? = null
     private lateinit var storage: FirebaseStorage
+    private var showLoadingIcon = false
+    private lateinit var pbLoadIcon : ProgressBar
 
     private var IMAGE_REQUEST_CODE = 1
 
@@ -93,6 +96,7 @@ class AccountFragment : Fragment() {
         btnSave = view.findViewById(R.id.btnSave)
         etvLocation = view.findViewById(R.id.etvAccountLocation)
         etvName = view.findViewById(R.id.etcAccountName)
+        pbLoadIcon = view.findViewById(R.id.pbSaveAccount)
         val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         tvAccount = view.findViewById(R.id.tvAccount)
         tvAccount.text = getString(R.string.accountLoggedIn, auth.currentUser?.email)
@@ -105,34 +109,44 @@ class AccountFragment : Fragment() {
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
             duration = 1000
         }
-
+        enableButtons()
         setUserUi()
 
 
         fabAddImage.setOnClickListener {
             //getContent.launch("image/*")
-            openCamera()
+            if(!showLoadingIcon) {
+                openCamera()
+            }
         }
 
         btnSave.setOnClickListener {
-            saveImage(view)
+            if(!showLoadingIcon) {
+                saveImage(view)
+            }
         }
         topAppBar.setOnMenuItemClickListener { menuItem ->
+
             when (menuItem.itemId) {
                 R.id.menuLogoutAccount -> {
-                    signOut()
-                    true
+                    if(!showLoadingIcon) {
+                        signOut()
+                    }
+                        true
+
                 }
 
                 R.id.menuDeleteAccount -> {
-                    showDeleteDialog(view)
-
+                    if(!showLoadingIcon) {
+                        showDeleteDialog(view)
+                    }
                     true
                 }
 
                 else -> false
             }
-        }
+
+            }
 
 
         return view
@@ -157,6 +171,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun saveImage(view: View) {
+        disableButtons()
         if(imageBitmap != null) {
             val storage = Firebase.storage
             val fileName = "image_${System.currentTimeMillis()}.jpg"
@@ -216,7 +231,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun deleteAccount(view: View) {
-
+        disableButtons()
         val user = Firebase.auth.currentUser
         Log.d("!!!", user?.uid.toString())
         Log.d("!!!", currentUser.userID.toString())
@@ -290,6 +305,8 @@ class AccountFragment : Fragment() {
                         Log.d("!!!", "got here")
                         Toast.makeText(requireContext(), getString(R.string.accountSaved), Toast.LENGTH_SHORT).show()
                         currentUser.updateUser(name, location, imageURL)
+                        enableButtons()
+
 
                     //                        Snackbar.make(view, getString(R.string.accountSaved), 2000).show()
                     }
@@ -298,7 +315,20 @@ class AccountFragment : Fragment() {
         }
     }
 
+    private fun disableButtons() {
+        btnSave.isEnabled = false
+        showLoadingIcon = true
+        pbLoadIcon.visibility = View.VISIBLE
+    }
+
+    private fun enableButtons() {
+        btnSave.isEnabled = true
+        showLoadingIcon = false
+        pbLoadIcon.visibility = View.INVISIBLE
+    }
+
     private fun signOut() {
+        enableButtons()
         currentUser.resetUser()
         auth.signOut()
         findNavController().navigate(R.id.loginFragment)
