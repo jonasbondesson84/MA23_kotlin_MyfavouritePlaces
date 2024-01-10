@@ -47,7 +47,7 @@ class FavouriteDetailFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private var _binding: FragmentFavouriteDetailBinding? = null
     private var isSavable = true
-    private var isEditable = false
+
 
     val binding get() = _binding!!
 
@@ -131,9 +131,8 @@ class FavouriteDetailFragment : Fragment() {
                     true
                 }
                 R.id.menuEditFavourite -> {
-                    if(isEditable) {
+
                         editPlace()
-                    }
                     true
                 }
                 R.id.menuDeleteFavourite -> {
@@ -182,9 +181,7 @@ class FavouriteDetailFragment : Fragment() {
             if(currentPlace?.author == currentUser.userID) {
                 val icon = binding.topAppBarDetails.menu.getItem(0)
                 icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
-
                 isSavable = false
-                isEditable = true
             } else {
                 binding.topAppBarDetails.menu.removeItem(R.id.menuEditFavourite)
                 binding.topAppBarDetails.menu.removeItem(R.id.menuDeleteFavourite)
