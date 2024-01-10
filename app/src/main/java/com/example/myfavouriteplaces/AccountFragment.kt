@@ -95,7 +95,7 @@ class AccountFragment : Fragment() {
         etvName = view.findViewById(R.id.etcAccountName)
         val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
         tvAccount = view.findViewById(R.id.tvAccount)
-        tvAccount.text = auth.currentUser?.email
+        tvAccount.text = getString(R.string.accountLoggedIn, auth.currentUser?.email)
         imAccount = view.findViewById(R.id.imAccountImage)
         fabAddImage = view.findViewById(R.id.fabAddImageAccount)
         storage = Firebase.storage

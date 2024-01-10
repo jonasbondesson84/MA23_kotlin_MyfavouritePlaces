@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
                         .addOnSuccessListener {
                             for(document in it) {
                                 val place = document.toObject<Place>()
-                                if(place != null  && place.public == true) {
+                                if(place != null  && place.public == true && place.author != currentUser.userID) {
                                     currentUser.sharedFavouritesList.add(place)
                                     //currentUser.favouritesList.add(place)
                                     Log.d("!!!", "place: ${place.docID}")

@@ -51,6 +51,8 @@
     <string name="userCollectionDeleted">You collection has been deleted.</string>
     <string name="accountSaved">Account info saved.</string>
     <string name="welcome">Welcome to My favourite places!</string>
+    <string name="accountLoggedIn">Email: %1$s</string>
+    <string name="appInfo">Here you can add your own favourite places and see others shared favourite places.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

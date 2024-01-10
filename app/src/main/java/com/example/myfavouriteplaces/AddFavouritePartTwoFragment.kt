@@ -87,7 +87,6 @@ class AddFavouritePartTwoFragment : Fragment() {
                 marker = googleMap.addMarker(MarkerOptions().position(latLng))
                 sharedViewModel.setLocation(latLng)
                 val text =" Latitude: ${sharedViewModel.lat.value}  \n Longitude: ${sharedViewModel.lat.value}"
-                binding.tvLatLng.text = text
                 binding.btnAddPartTwoNext.isEnabled = true
 
             }
