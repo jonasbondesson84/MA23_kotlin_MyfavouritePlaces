@@ -1,11 +1,9 @@
 package com.example.myfavouriteplaces
 
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.transition.Slide
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -79,21 +77,22 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
 
         binding.etvAddTitle.addTextChangedListener(textWatcher)
 
+        sharedElementEnterTransition = MaterialContainerTransform()
 
-        enterTransition = MaterialContainerTransform().apply {
-            startView = requireActivity().findViewById(R.id.fabAddFavourite)
-            endView = view
-            duration = 1000
-            scrimColor = Color.TRANSPARENT
-            containerColor = resources.getColor(R.color.md_theme_primary)
-            startContainerColor = resources.getColor(R.color.md_theme_secondary)
-            endContainerColor = resources.getColor(R.color.md_theme_surface)
-        }
-
-        returnTransition = Slide().apply {
-            duration = 500
-            addTarget(R.id.cardAddFavourite)
-        }
+//        enterTransition = MaterialContainerTransform().apply {
+//            startView = requireActivity().findViewById(R.id.fabAddFavourite)
+//            endView = view
+//            duration = 1000
+//            scrimColor = Color.TRANSPARENT
+//            containerColor = resources.getColor(R.color.md_theme_primary)
+//            startContainerColor = resources.getColor(R.color.md_theme_secondary)
+//            endContainerColor = resources.getColor(R.color.md_theme_surface)
+//        }
+//
+//        returnTransition = Slide().apply {
+//            duration = 500
+//            addTarget(R.id.cardAddFavourite)
+//        }
 
         binding.btnAddPartOneCancel.setOnClickListener {
             findNavController().navigateUp()

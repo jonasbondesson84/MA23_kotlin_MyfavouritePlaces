@@ -40,6 +40,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var storage: FirebaseStorage
+    private var showLoadingIcon = false
 
     private var _binding: FragmentAddFavouriteSummaryBinding? = null
     val binding get() = _binding!!
@@ -65,6 +66,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         setIcon()
         getImageIfEdited()
         hideElements()
+        enableButtons()
 
         binding.summaryMap.onCreate(savedInstanceState)
         binding.summaryMap.getMapAsync {googleMap ->
@@ -85,18 +87,23 @@ class AddFavouriteSummaryFragment : Fragment() {
             }
 
         binding.topSummary.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            if(!showLoadingIcon) {
+                activity?.onBackPressed()
+            }
         }
 
         binding.btnSummaryCancel.setOnClickListener {
-            findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
+            if(!showLoadingIcon) {
+                findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
+            }
         }
 
         binding.btnSummarySave.setOnClickListener {
-            Log.d("!!!", sharedViewModel.docID.value.toString())
-            saveImage(binding.root)
+            if(!showLoadingIcon) {
+                Log.d("!!!", sharedViewModel.docID.value.toString())
+                saveImage(binding.root)
 
-
+            }
         }
 
         return binding.root
@@ -155,6 +162,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     }
 
     private fun saveImage(view:View) {
+        disableButtons()
         if(sharedViewModel.imageUri.value != null) { //If you have selected an image, if first saves the image to firebase.storage, then saves the post in firebase
             val fileName = "image_${System.currentTimeMillis()}.jpg"
             val filePath = sharedViewModel.imageUri.value
@@ -218,6 +226,7 @@ class AddFavouriteSummaryFragment : Fragment() {
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
                     getFavourites(view)
+                    enableButtons()
                     findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                     //(activity as MainActivity).switchFragment(FavouriteFragment())
                 } else {
@@ -259,6 +268,7 @@ class AddFavouriteSummaryFragment : Fragment() {
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
                         getFavourites(view)
+                        enableButtons()
                         findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                         //(activity as MainActivity).switchFragment(FavouriteFragment())
                     } else {
@@ -286,6 +296,20 @@ class AddFavouriteSummaryFragment : Fragment() {
 
 
 
+    }
+
+    private fun disableButtons() {
+        showLoadingIcon = true
+        binding.pbSaveFavourite.visibility = View.VISIBLE
+        binding.btnSummarySave.isEnabled = false
+        binding.btnSummaryCancel.isEnabled = false
+    }
+
+    private fun enableButtons() {
+        showLoadingIcon = false
+        binding.pbSaveFavourite.visibility = View.INVISIBLE
+        binding.btnSummarySave.isEnabled = true
+        binding.btnSummaryCancel.isEnabled = true
     }
     companion object {
         /**

@@ -118,6 +118,9 @@
         <action
             android:id="@+id/action_addFavouritePartTwoFragment_to_addFaouritePartThreeFragment"
             app:destination="@id/addFaouritePartThreeFragment" />
+        <action
+            android:id="@+id/action_addFavouritePartTwoFragment_to_addFavouritePartOneFragment"
+            app:destination="@id/addFavouritePartOneFragment" />
     </fragment>
     <fragment
         android:id="@+id/addFaouritePartThreeFragment"
@@ -130,6 +133,9 @@
         <action
             android:id="@+id/action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment"
             app:destination="@id/addFavouriteSummaryFragment" />
+        <action
+            android:id="@+id/action_addFaouritePartThreeFragment_to_addFavouritePartTwoFragment"
+            app:destination="@id/addFavouritePartTwoFragment" />
     </fragment>
     <fragment
         android:id="@+id/addFavouriteSummaryFragment"
