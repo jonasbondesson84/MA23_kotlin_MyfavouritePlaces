@@ -12,16 +12,18 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.card.MaterialCardView
 
 class FavouritesAdapter (context: Context, val listOfFavourites: MutableList<Place>): RecyclerView.Adapter<FavouritesAdapter.ViewHolder>() {
 
     private val layoutInflater = LayoutInflater.from(context)
 
-    var onCardClick: ((Place) -> Unit)? = null
+    var onCardClick: ((Place, MaterialCardView) -> Unit)? = null
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var tvTitle: TextView = itemView.findViewById(R.id.tvCardTitle)
-        var tvDesc: TextView = itemView.findViewById(R.id.tvCardDesc)
-        var imFavourite: ImageView = itemView.findViewById(R.id.imCardImage)
+        var tvTitle: TextView = itemView.findViewById(R.id.tvFavouriteTitle)
+        var tvDesc: TextView = itemView.findViewById(R.id.tvFavouriteDescription)
+        var imFavourite: ImageView = itemView.findViewById(R.id.imFavouriteImage)
+        var card: MaterialCardView = itemView.findViewById(R.id.card)
     }
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -35,8 +37,13 @@ class FavouritesAdapter (context: Context, val listOfFavourites: MutableList<Pla
     }
 
     override fun onBindViewHolder(holder: FavouritesAdapter.ViewHolder, position: Int) {
-        holder.tvTitle.text = listOfFavourites[position].title
-        holder.tvDesc.text = listOfFavourites[position].description
+        val place = listOfFavourites[position]
+        holder.tvTitle.text = place.title
+        holder.tvDesc.text = place.description
+        holder.tvTitle.transitionName = place.title
+        holder.tvDesc.transitionName =  place.description
+        holder.imFavourite.transitionName = place.imageURL
+        holder.card.transitionName = place.docID
         var requestOptions = RequestOptions()
         requestOptions = requestOptions.transforms(FitCenter(), RoundedCorners(16))
         Glide.with(holder.itemView.context)
@@ -51,7 +58,7 @@ class FavouritesAdapter (context: Context, val listOfFavourites: MutableList<Pla
 
         holder.itemView.setOnClickListener {
             val place = listOfFavourites[position]
-            onCardClick?.invoke(place)
+            onCardClick?.invoke(place, holder.card)
         }
     }
 

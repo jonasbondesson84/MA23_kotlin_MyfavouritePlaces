@@ -16,6 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.transition.MaterialSharedAxis
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -32,6 +33,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
+
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+            duration = 1000
+        }
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+            duration = 1000
+        }
+
         topAppBar = view.findViewById(R.id.topAppMaps)
 
         topAppBar.setNavigationOnClickListener {

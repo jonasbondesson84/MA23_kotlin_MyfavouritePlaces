@@ -1,17 +1,19 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -61,29 +63,56 @@ class FavouritesFragment : Fragment() {
         db = Firebase.firestore
         auth = Firebase.auth
 
-        rvFavourites.layoutManager = LinearLayoutManager(view.context)
+
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
+
+        rvFavourites.layoutManager = GridLayoutManager(view.context,2 )
         adapter = FavouritesAdapter(view.context, currentUser.favouritesList)
         rvFavourites.adapter = adapter
-        sharedViewModel.resetValues()
-        getFavourites(view)
 
-        adapter.onCardClick = {
-            Log.d("!!!", it.docID.toString())
-            val placeID = it.docID
-            sharedViewModel.setPlace(it)
+        sharedViewModel.resetValues()
+        //getFavourites(view)
+
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+            duration = 1000
+        }
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+            duration = 1000
+        }
+
+        adapter.onCardClick = {place, card->
+
+//            exitTransition = MaterialElevationScale(false).apply {
+//                duration = 2000
+//            }
+//            reenterTransition = MaterialElevationScale(true).apply {
+//                duration = 2000
+//            }
+            val cardID = place.docID
+            val placeID = place.docID
+            sharedViewModel.setPlace(place)
             val action = FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(placeID)
-            if (placeID != null) {
-                Log.d("!!!", placeID.toString())
-                findNavController().navigate(action)
+
+            if(cardID != null) {
+                val extra = FragmentNavigatorExtras(card to cardID)
+                findNavController().navigate(action,extra)
             }
+
         }
 
         fabAdd.setOnClickListener {
+
             sharedViewModel.resetValues()
             findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment)
         }
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
     private fun getFavourites(view: View) {
         val user = currentUser
