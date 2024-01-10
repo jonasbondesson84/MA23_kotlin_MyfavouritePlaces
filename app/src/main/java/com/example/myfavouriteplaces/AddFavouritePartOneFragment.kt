@@ -91,7 +91,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         }
 
         returnTransition = Slide().apply {
-            duration = 1000
+            duration = 500
             addTarget(R.id.cardAddFavourite)
         }
 
