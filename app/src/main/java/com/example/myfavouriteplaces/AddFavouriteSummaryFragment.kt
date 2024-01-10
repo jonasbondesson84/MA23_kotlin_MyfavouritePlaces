@@ -225,7 +225,8 @@ class AddFavouriteSummaryFragment : Fragment() {
         db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(place)
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
-                    getFavourites(view)
+                    //getFavourites(view)
+                    (activity as MainActivity).getUserFavourites()
                     enableButtons()
                     findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                     //(activity as MainActivity).switchFragment(FavouriteFragment())
@@ -267,7 +268,8 @@ class AddFavouriteSummaryFragment : Fragment() {
                 "reviewTitle", place.reviewTitle)
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
-                        getFavourites(view)
+                        (activity as MainActivity).getUserFavourites()
+                        //getFavourites(view)
                         enableButtons()
                         findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                         //(activity as MainActivity).switchFragment(FavouriteFragment())

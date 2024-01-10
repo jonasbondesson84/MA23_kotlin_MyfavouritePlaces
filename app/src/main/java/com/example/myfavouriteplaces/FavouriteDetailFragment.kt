@@ -190,12 +190,14 @@ class FavouriteDetailFragment : Fragment() {
 
     private fun saveShared() {
         val savePlace = sharedViewModel.getPlace()
+        savePlace.author = currentUser.userID
         db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(savePlace)
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
                     Snackbar.make(binding.root, getString(R.string.savedPlace), 2000).show()
                     val icon = binding.topAppBarDetails.menu.getItem(0)
                     icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
+                    (activity as MainActivity).getUserFavourites()
                 } else {
                     Snackbar.make(binding.root, "Error", 2000).show()
                 }
