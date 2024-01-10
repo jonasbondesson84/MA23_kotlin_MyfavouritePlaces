@@ -13,6 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.appbar.MaterialToolbar
@@ -80,8 +81,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         map.setInfoWindowAdapter(adapter)
 
 
-        createMarksFavourites(map)
+
         createMarksShared(map)
+        createMarksFavourites(map)
+
         Log.d("!!!", lat.toString() + lng.toString())
         if (lat != null && lng != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat!!, lng!!), 15f))
@@ -121,11 +124,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun createMarksShared(map: GoogleMap) {
+
         for(place in currentUser.sharedFavouritesList) {
             place.lat?.let {it1 ->
                 place.lng?.let {it2 ->
                     val position = LatLng(it1, it2)
-                    val marker = map.addMarker(MarkerOptions().position(position).title(place.title))
+                    val marker = map.addMarker(MarkerOptions().position(position).title(place.title).icon(
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+                    ))
                     marker?.tag = place
                 }
             }

@@ -18,10 +18,9 @@ class PlacesInfoAdapter(val context: Context): GoogleMap.InfoWindowAdapter {
 
     override fun getInfoWindow(p0: Marker): View? {
         val infoWindow = layoutInflater.inflate(R.layout.place_info_window, null)
-
-
         val tvTitle = infoWindow.findViewById<TextView>(R.id.tvWindowTitle)
         val tvDesc = infoWindow.findViewById<TextView>(R.id.tvWindowDesc)
+
 
         val place = p0.tag as? Place
 

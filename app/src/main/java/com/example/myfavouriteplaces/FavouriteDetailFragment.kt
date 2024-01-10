@@ -182,8 +182,12 @@ class FavouriteDetailFragment : Fragment() {
             if(currentPlace?.author == currentUser.userID) {
                 val icon = binding.topAppBarDetails.menu.getItem(0)
                 icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
+
                 isSavable = false
                 isEditable = true
+            } else {
+                binding.topAppBarDetails.menu.removeItem(R.id.menuEditFavourite)
+                binding.topAppBarDetails.menu.removeItem(R.id.menuDeleteFavourite)
             }
     }
 
