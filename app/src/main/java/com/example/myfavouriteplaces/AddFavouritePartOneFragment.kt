@@ -1,9 +1,11 @@
 package com.example.myfavouriteplaces
 
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.transition.Slide
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.myfavouriteplaces.databinding.FragmentAddFavouritePartOneBinding
+import com.google.android.material.transition.MaterialContainerTransform
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -76,8 +79,25 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
 
         binding.etvAddTitle.addTextChangedListener(textWatcher)
 
+
+        enterTransition = MaterialContainerTransform().apply {
+            startView = requireActivity().findViewById(R.id.fabAddFavourite)
+            endView = view
+            duration = 1000
+            scrimColor = Color.TRANSPARENT
+            containerColor = resources.getColor(R.color.md_theme_primary)
+            startContainerColor = resources.getColor(R.color.md_theme_secondary)
+            endContainerColor = resources.getColor(R.color.md_theme_surface)
+        }
+
+        returnTransition = Slide().apply {
+            duration = 1000
+            addTarget(R.id.cardAddFavourite)
+        }
+
         binding.btnAddPartOneCancel.setOnClickListener {
-            findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_favourites_fragment)
+            findNavController().navigateUp()
+//            findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_favourites_fragment)
         }
         binding.btnAddPartOneNext.setOnClickListener {
             if (binding.etvAddTitle.text.isNotEmpty()) {

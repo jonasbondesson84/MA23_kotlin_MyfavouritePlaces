@@ -1,5 +1,6 @@
 package com.example.myfavouriteplaces
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.myfavouriteplaces.databinding.FragmentFavouriteDetailBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -55,6 +57,8 @@ class FavouriteDetailFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+
     }
 
     override fun onCreateView(
@@ -68,12 +72,27 @@ class FavouriteDetailFragment : Fragment() {
         auth = Firebase.auth
 
 
-        val placeID = args.placeID
-        if (placeID != null) {
-            getPlace(placeID)
-        } else {
-            Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
+
+        val place = args
+//        if (placeID != null) {
+//            getPlace(placeID)
+//        } else {
+//            Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
+//        }
+        currentPlace = sharedViewModel.getPlace()
+        binding.tvFavouriteTitle.transitionName = sharedViewModel.title.value
+        binding.tvFavouriteDescription.transitionName = sharedViewModel.description.value
+        binding.imFavouriteImage.transitionName = sharedViewModel.imageURL.value
+
+        binding.card.transitionName = place.placeID
+
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.nav_host_fragment
+            duration = 1000
+            scrimColor = Color.TRANSPARENT
+            setAllContainerColors(resources.getColor(R.color.md_theme_primary))
         }
+
         hideSaveIcon()
 
         getImage()
@@ -201,7 +220,7 @@ class FavouriteDetailFragment : Fragment() {
             //.apply(requestOptions)
             .placeholder(R.drawable.baseline_image_not_supported_24)
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .into(binding.imDetailsImage)
+            .into(binding.imFavouriteImage)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

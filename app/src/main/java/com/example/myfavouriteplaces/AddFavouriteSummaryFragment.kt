@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 
@@ -216,6 +217,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(place)
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
+                    getFavourites(view)
                     findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                     //(activity as MainActivity).switchFragment(FavouriteFragment())
                 } else {
@@ -256,6 +258,7 @@ class AddFavouriteSummaryFragment : Fragment() {
                 "reviewTitle", place.reviewTitle)
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
+                        getFavourites(view)
                         findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
                         //(activity as MainActivity).switchFragment(FavouriteFragment())
                     } else {
@@ -265,7 +268,25 @@ class AddFavouriteSummaryFragment : Fragment() {
         }
 
     }
+    private fun getFavourites(view: View) {
+        val user = currentUser
+        currentUser.favouritesList.clear()
+        val db = Firebase.firestore
 
+            db.collection("users").document(user.userID.toString()).collection("favourites").get()
+                .addOnSuccessListener { documentSnapshot ->
+                    for (document in documentSnapshot.documents) {
+                        val place = document.toObject<Place>()
+                        if (place != null) {
+                            currentUser.favouritesList.add(place)
+                        }
+                    }
+
+                }
+
+
+
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of

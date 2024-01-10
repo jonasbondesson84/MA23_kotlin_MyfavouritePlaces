@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -15,6 +16,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -36,6 +38,11 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_LOCATION = 1
     private var lat: Double? = null
     private var lng: Double? = null
+    val currentNavigationFragment: Fragment?
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.childFragmentManager
+            ?.fragments
+            ?.first()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,14 +80,38 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnNavigationItemSelectedListener {item ->
             when(item.itemId) { 
                 R.id.home_fragment -> {
+                    currentNavigationFragment?.apply {
+                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                            duration = 1000
+                        }
+                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                            duration = 1000
+                        }
+                    }
                     navController.navigate(R.id.home_fragment)
                     true
                 }
                 R.id.favourites_fragment -> {
+                    currentNavigationFragment?.apply {
+                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                            duration = 1000
+                        }
+                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                            duration = 1000
+                        }
+                    }
                     navController.navigate(R.id.favourites_fragment)
                     true
                 }
                 R.id.maps_fragment -> {
+                    currentNavigationFragment?.apply {
+                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                            duration = 1000
+                        }
+                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                            duration = 1000
+                        }
+                    }
                     val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
                     if(currentFragment == FavouriteDetailFragment()) {
                         val lat = currentUser.latLng?.latitude?.toFloat()
@@ -103,6 +134,14 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.account_fragment -> {
+                    currentNavigationFragment?.apply {
+                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                            duration = 1000
+                        }
+                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                            duration = 1000
+                        }
+                    }
                     if(auth.currentUser == null) {
                         navController.navigate(R.id.loginFragment)
                         true
