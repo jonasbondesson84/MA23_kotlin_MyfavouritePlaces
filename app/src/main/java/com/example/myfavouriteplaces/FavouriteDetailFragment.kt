@@ -274,6 +274,7 @@ class FavouriteDetailFragment : Fragment() {
                 "favourites"
             ).document(it).delete().addOnCompleteListener {task ->
                 if(task.isSuccessful) {
+                    (activity as MainActivity).getUserFavourites()
                     findNavController().navigate(R.id.action_favouriteDetailFragment_to_favourites_fragment)
                     //(activity as MainActivity).switchFragment(FavouriteFragment())
                 }

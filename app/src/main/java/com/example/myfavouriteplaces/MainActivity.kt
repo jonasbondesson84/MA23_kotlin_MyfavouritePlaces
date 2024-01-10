@@ -186,7 +186,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getUserFavourites() {
+     fun getUserFavourites() {
         currentUser.favouritesList.clear()
         if (currentUser.userID == null) {
             //Snackbar.make(view, getString(R.string.mustBeSignedIn), 2000).show()
