@@ -73,6 +73,9 @@ class FavouritesFragment : Fragment() {
 
         sharedViewModel.resetValues()
         //getFavourites(view)
+        if (currentUser.userID == null) {
+            fabAdd.visibility = View.INVISIBLE
+        }
 
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
             duration = 1000
