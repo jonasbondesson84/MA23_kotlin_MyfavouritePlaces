@@ -24,7 +24,8 @@
         android:text="@string/login"
         android:enabled="false"
         app:layout_constraintStart_toStartOf="@+id/etvPassword"
-        app:layout_constraintTop_toBottomOf="@+id/etvPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/etvPassword"
+        />
 
     <EditText
         android:id="@+id/etvUser"
