@@ -137,7 +137,7 @@ class AddFavouritePartTwoFragment : Fragment() {
     }
     override fun onDestroy() {
         super.onDestroy()
-        //binding.addLocationMap.onDestroy()
+       // binding.addLocationMap.onDestroy()
     }
 
     override fun onLowMemory() {
