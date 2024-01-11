@@ -27,9 +27,9 @@ import com.google.firebase.firestore.toObject
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var bottomNav: BottomNavigationView
-    lateinit var navHostFragment: NavHostFragment
-    lateinit var navController: NavController
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var navController: NavController
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private lateinit var locationProvider: FusedLocationProviderClient
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_LOCATION = 1
     private var lat: Double? = null
     private var lng: Double? = null
-    val currentNavigationFragment: Fragment?
+    private val currentNavigationFragment: Fragment?
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.childFragmentManager
             ?.fragments
@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.bottom_nav)
@@ -58,21 +57,10 @@ class MainActivity : AppCompatActivity() {
         locationRequest = LocationRequest.Builder(2000L).build()
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-
             }
         }
-        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION)
-        }
-
-
+        checkIfLocationGrated()
         checkIfUserIsLoggedIn()
-
-
-
         NavigationUI.setupWithNavController(
             bottomNav, navController
         )
@@ -80,68 +68,23 @@ class MainActivity : AppCompatActivity() {
         bottomNav.setOnNavigationItemSelectedListener {item ->
             when(item.itemId) { 
                 R.id.home_fragment -> {
-                    currentNavigationFragment?.apply {
-                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-                            duration = 1000
-                        }
-                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-                            duration = 1000
-                        }
-                    }
+                    setNavTransition()
                     navController.navigate(R.id.home_fragment)
                     true
                 }
                 R.id.favourites_fragment -> {
-                    currentNavigationFragment?.apply {
-                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-                            duration = 1000
-                        }
-                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-                            duration = 1000
-                        }
-                    }
+                    setNavTransition()
                     navController.navigate(R.id.favourites_fragment)
                     true
                 }
                 R.id.maps_fragment -> {
-                    currentNavigationFragment?.apply {
-                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-                            duration = 1000
-                        }
-                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-                            duration = 1000
-                        }
-                    }
-                    val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-                    if(currentFragment == FavouriteDetailFragment()) {
-                        val lat = currentUser.latLng?.latitude?.toFloat()
-                        val lng = currentUser.latLng?.longitude?.toFloat()
-                        val action =
-                            lat?.let { it1 ->
-                                lng?.let { it2 ->
-                                    HomeFragmentDirections.actionHomeFragmentToMapsFragment(
-                                        it1,
-                                        it2
-                                    )
-                                }
-                            }
-                        if (action != null) {
-                            navController.navigate(action)
-                        }
-                    }else {
-                        navController.navigate(R.id.maps_fragment)
-                    }
+                    setNavTransition()
+                    //moveToMaps()
+                    navController.navigate(R.id.maps_fragment)
                     true
                 }
                 R.id.account_fragment -> {
-                    currentNavigationFragment?.apply {
-                        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-                            duration = 1000
-                        }
-                        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-                            duration = 1000
-                        }
-                    }
+                    setNavTransition()
                     if(auth.currentUser == null) {
                         navController.navigate(R.id.loginFragment)
                         true
@@ -155,13 +98,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun setNavTransition() {
+        currentNavigationFragment?.apply {
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                duration = 1000
+            }
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                duration = 1000
+            }
+        }
+    }
+
+    private fun checkIfLocationGrated() {
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION)
+        }
+    }
+
     private fun checkIfUserIsLoggedIn() {
         val user = auth.currentUser
         if(user != null) {
             getUserDetails(user)
         }
         getLastLocation()
-
     }
 
     fun getUserDetails(user: FirebaseUser) {
@@ -169,35 +132,33 @@ class MainActivity : AppCompatActivity() {
             for(document in documentSnapshot) {
                 if(document.get("userID").toString() == user.uid) {
                     Log.d("!!!", "Got it!")
-                    val user = document.toObject<User>()
-                    currentUser.name = user.name
-                    currentUser.userID = user.userID
-                    currentUser.userImage = user.userImage
-                    currentUser.location = user.location
-                    currentUser.documentId = user.documentId
-                    Log.d("!!!", currentUser.documentId.toString())
+                    val newUser = document.toObject<User>()
+                    CurrentUser.name = newUser.name
+                    CurrentUser.userID = newUser.userID
+                    CurrentUser.userImage = newUser.userImage
+                    CurrentUser.location = newUser.location
+                    CurrentUser.documentId = newUser.documentId
+                    Log.d("!!!", CurrentUser.documentId.toString())
                     getUserFavourites()
                     getSharedFavourites()
                     return@addOnSuccessListener
                 }
             }
-            Log.d("!!!", "user not found!")
         }
 
     }
 
      fun getUserFavourites() {
-        currentUser.favouritesList.clear()
-        if (currentUser.userID == null) {
-            //Snackbar.make(view, getString(R.string.mustBeSignedIn), 2000).show()
+        CurrentUser.favouritesList.clear()
+        if (CurrentUser.userID == null) {
             return
         } else {
-            db.collection("users").document(currentUser.userID.toString()).collection("favourites").get()
+            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").get()
                 .addOnSuccessListener { documentSnapshot ->
                     for (document in documentSnapshot.documents) {
                         val place = document.toObject<Place>()
                         if (place != null) {
-                            currentUser.favouritesList.add(place)
+                            CurrentUser.favouritesList.add(place)
                         }
                     }
                 }
@@ -207,16 +168,14 @@ class MainActivity : AppCompatActivity() {
     private fun getSharedFavourites() {
         db.collection("usersCollection").get().addOnSuccessListener { documentSnapshot ->
             for (document in documentSnapshot) {
-
                 val user = document.get("userID").toString()
                 if(user != null) {
                     db.collection("users").document(user).collection("favourites").get()
                         .addOnSuccessListener {
                             for(document in it) {
                                 val place = document.toObject<Place>()
-                                if(place != null  && place.public == true && place.author != currentUser.userID) {
-                                    currentUser.sharedFavouritesList.add(place)
-                                    //currentUser.favouritesList.add(place)
+                                if(place != null  && place.public == true && place.author != CurrentUser.userID) {
+                                    CurrentUser.sharedFavouritesList.add(place)
                                     Log.d("!!!", "place: ${place.docID}")
                                 }
                             }
@@ -232,23 +191,15 @@ class MainActivity : AppCompatActivity() {
             locationProvider.lastLocation.addOnCompleteListener {task->
                 if(task.isSuccessful) {
                     val location = task.result
-
                     if (location != null) {
-
                         lat = location.latitude
                         lng = location.longitude
-
-//                        Snackbar.make(flMain, "lat: ${location.latitude} lng: ${location.longitude}", 2000).show()
-                        Log.d("!!!", "lat: ${location.latitude} lng: ${location.longitude}")
                     } else {
                         val sthlm = LatLng(59.334591, 18.063240)
                         lat = sthlm.latitude
                         lng = sthlm.longitude
-                        Log.d("!!!", "No location")
                     }
-                    currentUser.latLng = LatLng(lat!!, lng!!)
-
-
+                    CurrentUser.latLng = LatLng(lat!!, lng!!)
                 }
             }
         }
@@ -267,9 +218,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showMap(fragmentID: Int, ) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(fragmentID, MapsFragment(), "locationMap").commit()
-    }
-    
 }

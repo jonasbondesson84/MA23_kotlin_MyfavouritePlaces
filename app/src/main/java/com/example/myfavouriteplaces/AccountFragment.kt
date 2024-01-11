@@ -5,29 +5,20 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.material.appbar.MaterialToolbar
+import com.example.myfavouriteplaces.databinding.FragmentAccountBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Firebase
@@ -55,26 +46,12 @@ class AccountFragment : Fragment() {
     private var param2: String? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
-    private lateinit var etvName: EditText
-    private lateinit var etvLocation: EditText
-    private lateinit var btnSave: Button
-    private lateinit var tvAccount: TextView
-    private lateinit var imAccount: ImageView
-    private lateinit var fabAddImage: FloatingActionButton
-    private var imageUri: Uri? = null
     private var imageBitmap: Bitmap? = null
     private lateinit var storage: FirebaseStorage
     private var showLoadingIcon = false
-    private lateinit var pbLoadIcon : ProgressBar
-
     private var IMAGE_REQUEST_CODE = 1
-
-    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        // Handle the returned Uri
-        imageUri = uri
-        Log.d("!!!", "uri = $uri")
-        imAccount.setImageURI(uri)
-    }
+    private var _binding: FragmentAccountBinding? = null
+    val binding get() = _binding!!
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,124 +67,109 @@ class AccountFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_account, container, false)
+
+        _binding = FragmentAccountBinding.inflate(inflater,container,false)
         auth = Firebase.auth
         db = Firebase.firestore
-        btnSave = view.findViewById(R.id.btnSave)
-        etvLocation = view.findViewById(R.id.etvAccountLocation)
-        etvName = view.findViewById(R.id.etcAccountName)
-        pbLoadIcon = view.findViewById(R.id.pbSaveAccount)
-        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAppBar)
-        tvAccount = view.findViewById(R.id.tvAccount)
-        tvAccount.text = getString(R.string.accountLoggedIn, auth.currentUser?.email)
-        imAccount = view.findViewById(R.id.imAccountImage)
-        fabAddImage = view.findViewById(R.id.fabAddImageAccount)
         storage = Firebase.storage
+
+        //Sets the transition to and from the view.
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
             duration = 1000
         }
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
             duration = 1000
         }
+
         enableButtons()
         setUserUi()
 
 
-        fabAddImage.setOnClickListener {
-            //getContent.launch("image/*")
-            if(!showLoadingIcon) {
+        binding.fabAddImageAccount.setOnClickListener {
+            if (!showLoadingIcon) {
                 openCamera()
             }
         }
 
-        btnSave.setOnClickListener {
-            if(!showLoadingIcon) {
-                saveImage(view)
+        binding.btnSave.setOnClickListener {
+            if (!showLoadingIcon) {
+                saveImage(binding.root)
             }
         }
-        topAppBar.setOnMenuItemClickListener { menuItem ->
-
-            when (menuItem.itemId) {
-                R.id.menuLogoutAccount -> {
-                    if(!showLoadingIcon) {
-                        signOut()
-                    }
-                        true
-
-                }
-
-                R.id.menuDeleteAccount -> {
-                    if(!showLoadingIcon) {
-                        showDeleteDialog(view)
-                    }
-                    true
-                }
-
-                else -> false
+        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+            if(!showLoadingIcon) {
+                menuClickResult(menuItem)
+            } else {
+                false
             }
+        }
+        return binding.root
+    }
 
+    private fun menuClickResult(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
+            R.id.menuLogoutAccount -> {
+                signOut()
+                return true
             }
+            R.id.menuDeleteAccount -> {
+                    showDeleteDialog(binding.root)
+                return true
+            }
+            else ->  return false
+        }
 
+    }
 
-        return view
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setUserUi() {
-        if (currentUser.name != null) {
-            etvName.setText(currentUser.name)
+        if (CurrentUser.name != null) {
+            binding.etcAccountName.setText(CurrentUser.name)
         }
-        if (currentUser.location != null) {
-            etvLocation.setText(currentUser.location)
+        if (CurrentUser.location != null) {
+            binding.etvAccountLocation.setText(CurrentUser.location)
         }
-        Log.d("!!!", "userimage: ${currentUser.userImage.toString()}")
-        if(currentUser.userImage != null) {
+        if (CurrentUser.userImage != null) {
             Glide
                 .with(this)
-                .load(currentUser.userImage)
+                .load(CurrentUser.userImage)
                 .placeholder(R.drawable.baseline_image_not_supported_24)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(imAccount)
+                .into(binding.imAccountImage)
         }
     }
 
     private fun saveImage(view: View) {
         disableButtons()
-        if(imageBitmap != null) {
+        if (imageBitmap != null) {
             val storage = Firebase.storage
             val fileName = "image_${System.currentTimeMillis()}.jpg"
             val storageRef = storage.reference.child("images").child(fileName)
-            // Convert the Bitmap to a byte array
+
             val baos = ByteArrayOutputStream()
             imageBitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             val data = baos.toByteArray()
 
-            // Upload the image to Firebase Storage
             val uploadTask = storageRef.putBytes(data)
             uploadTask.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         val downloadUrl = uri.toString()
-                        Log.d("MainActivity", "Download URL: $downloadUrl")
-
-
-                        Toast.makeText(
-                            requireContext(),
-                            "Image uploaded successfully",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                        saveData(downloadUrl)
-                        // You can save the downloadUrl or use it to display the image later
+                        saveData(downloadUrl, view)
                     }
                 } else {
                     // Image upload failed
-                    Log.d("!!!", "failed")
-                    val exception = task.exception
-                    // Handle the exception
+                    Snackbar.make(view, getString(R.string.errorImageUpload), 2000).show()
+
+                    enableButtons()
                 }
             }
         } else {
-            saveData(currentUser.userImage)
+            saveData(CurrentUser.userImage, view)
         }
     }
 
@@ -217,14 +179,12 @@ class AccountFragment : Fragment() {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.warning))
                 .setMessage(resources.getString(R.string.deleteAccountDesc))
-
                 .setNegativeButton(resources.getString(R.string.no)) { dialog, which ->
                     // Respond to negative button press
-
                 }
                 .setPositiveButton(resources.getString(R.string.yes)) { dialog, which ->
                     // Respond to positive button press
-                    deleteAccount(view)
+                    deleteFromUsersCollection(view)
                 }
                 .show()
         }
@@ -233,103 +193,76 @@ class AccountFragment : Fragment() {
     private fun deleteAccount(view: View) {
         disableButtons()
         val user = Firebase.auth.currentUser
-        Log.d("!!!", user?.uid.toString())
-        Log.d("!!!", currentUser.userID.toString())
         user?.delete()?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-
                 Snackbar.make(view, getString(R.string.accountDeleted), 2000).show()
-                deleteFromUsersCollection(view)
+                signOut()
             }
         }
-
     }
 
     private fun deleteFromUsersCollection(view: View) {
         val db = Firebase.firestore
-        Log.d("!!!", currentUser.documentId.toString())
-        db.collection("usersCollection").document(currentUser.documentId.toString()).delete()
+        db.collection("usersCollection").document(CurrentUser.documentId.toString()).delete()
             .addOnSuccessListener {
                 deleteUsersFavourites(view)
             }
-//        for (place in currentUser.favouritesList) {
-//            val docID = place.docID
-//            if (docID != null) {
-//                db.collection("usersCollection").document(currentUser.userID.toString())
-//                    .collection("favourites").document(docID).delete()
-//                    .addOnSuccessListener {
-//                        db.collection("users").document(currentUser.userID.toString()).delete()
-//                            .addOnSuccessListener {
-//                                Snackbar.make(view, getString(R.string.userCollectionDeleted), 2000)
-//                                    .show()
-//                                signOut()
-//                            }
-//
-//                    }
-//            }
-//        }
     }
 
     private fun deleteUsersFavourites(view: View) {
         val db = Firebase.firestore
-        Log.d("!!!", currentUser.userID.toString())
-        for (place in currentUser.favouritesList) {
+        for (place in CurrentUser.favouritesList) {
             val docID = place.docID
             if (docID != null) {
-                db.collection("users").document(currentUser.userID.toString())
+                db.collection("users").document(CurrentUser.userID.toString())
                     .collection("favourites").document(docID).delete()
                     .addOnSuccessListener {
-                        db.collection("users").document(currentUser.userID.toString()).delete()
+                        db.collection("users").document(CurrentUser.userID.toString()).delete()
                             .addOnSuccessListener {
                                 Snackbar.make(view, getString(R.string.userCollectionDeleted), 2000)
                                     .show()
-                                signOut()
+                                deleteAccount(view)
                             }
-
                     }
             }
         }
-
     }
 
-    private fun saveData(imageURL: String?) {
-        val name = etvName.text.toString()
-        val location = etvLocation.text.toString()
-        if (currentUser.userID != null) {
-            db.collection("usersCollection").document(currentUser.documentId.toString())
-                .update("name", name,
+    private fun saveData(imageURL: String?, view: View) {
+        val name = binding.etcAccountName.text.toString()
+        val location = binding.etvAccountLocation.text.toString()
+        if (CurrentUser.userID != null) {
+            db.collection("usersCollection").document(CurrentUser.documentId.toString())
+                .update(
+                    "name", name,
                     "location", location,
-                    "userImage", imageURL)
+                    "userImage", imageURL
+                )
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("!!!", "got here")
-                        Toast.makeText(requireContext(), getString(R.string.accountSaved), Toast.LENGTH_SHORT).show()
-                        currentUser.updateUser(name, location, imageURL)
+                        Snackbar.make(view, getString(R.string.accountSaved), 2000).show()
+                        CurrentUser.updateUser(name, location, imageURL)
                         enableButtons()
-
-
-                    //                        Snackbar.make(view, getString(R.string.accountSaved), 2000).show()
                     }
-
                 }
         }
     }
 
     private fun disableButtons() {
-        btnSave.isEnabled = false
+        binding.btnSave.isEnabled = false
         showLoadingIcon = true
-        pbLoadIcon.visibility = View.VISIBLE
+        binding.pbSaveAccount.visibility = View.VISIBLE
     }
 
     private fun enableButtons() {
-        btnSave.isEnabled = true
+        binding.btnSave.isEnabled = true
         showLoadingIcon = false
-        pbLoadIcon.visibility = View.INVISIBLE
+        binding.pbSaveAccount.visibility = View.INVISIBLE
     }
 
     private fun signOut() {
         enableButtons()
-        currentUser.resetUser()
+        CurrentUser.resetUser()
         auth.signOut()
         findNavController().navigate(R.id.loginFragment)
     }
@@ -343,9 +276,9 @@ class AccountFragment : Fragment() {
                     startActivityForResult(takePictureIntent, IMAGE_REQUEST_CODE)
                 } catch (e: ActivityNotFoundException) {
                     // display error state to the user
-                }}
-        }
-        else{
+                }
+            }
+        } else {
             requestCameraPermission()
         }
     }
@@ -374,13 +307,12 @@ class AccountFragment : Fragment() {
         }
         return false
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-
             imageBitmap = data?.extras?.get("data") as Bitmap
-
-            imAccount.setImageBitmap(imageBitmap)
+            binding.imAccountImage.setImageBitmap(imageBitmap)
 
         }
     }

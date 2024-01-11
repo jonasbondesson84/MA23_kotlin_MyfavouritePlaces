@@ -3,21 +3,18 @@ package com.example.myfavouriteplaces
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.myfavouriteplaces.databinding.FragmentLoginBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -33,21 +30,21 @@ class LoginFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var btnLogin: Button
-    private lateinit var btnSignUp: Button
-    private lateinit var etvUser: EditText
-    private lateinit var etvPassword: EditText
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+
+    private var _binding: FragmentLoginBinding? = null
+    val binding get() = _binding!!
+
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            val user = etvUser.text.toString()
-            val pw = etvPassword.text.toString()
-            btnLogin.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
-            btnSignUp.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
+            val user = binding.etvUser.text.toString()
+            val pw = binding.etvPassword.text.toString()
+            binding.btnLogin.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
+            binding.btnSignup.isEnabled = (user.isNotEmpty() && pw.isNotEmpty())
         }
 
         override fun afterTextChanged(s: Editable?) {}
@@ -65,42 +62,43 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_login, container, false)
-        btnLogin = view.findViewById(R.id.btnLogin)
-        btnSignUp = view.findViewById(R.id.btnSignup)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
-        etvUser = view.findViewById(R.id.etvUser)
-        etvPassword = view.findViewById(R.id.etvPassword)
         auth = Firebase.auth
         db = Firebase.firestore
 
-        etvUser.addTextChangedListener(textWatcher)
-        etvPassword.addTextChangedListener(textWatcher)
+        binding.etvUser.addTextChangedListener(textWatcher)
+        binding.etvPassword.addTextChangedListener(textWatcher)
 
-        btnLogin.setOnClickListener {
-            signIn(view)
+        binding.btnLogin.setOnClickListener {
+            signIn(binding.root)
         }
 
-        btnSignUp.setOnClickListener {
-            signUp(view)
+        binding.btnSignup.setOnClickListener {
+            signUp(binding.root)
         }
 
-        return view
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 
     private fun signIn(view: View) {
-        val email = etvUser.text.toString()
-        val password = etvPassword.text.toString()
+        val email = binding.etvUser.text.toString()
+        val password = binding.etvPassword.text.toString()
         if (email.isEmpty() || password.isEmpty()) {
             return
         }
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    auth.currentUser?.let { (activity as MainActivity).getUserDetails(it) }//getCurrentUserInfo()
+                    auth.currentUser?.let { (activity as MainActivity).getUserDetails(it) }
                     findNavController().navigate(R.id.action_loginFragment_to_home_fragment)
-//                    (activity as MainActivity).switchFragment(StartFragment())
+
                 } else {
                     Snackbar.make(view, getText(R.string.errorLogIn), 2000).show()
                 }
@@ -108,8 +106,8 @@ class LoginFragment : Fragment() {
     }
 
     private fun signUp(view: View) {
-        val email = etvUser.text.toString()
-        val password = etvPassword.text.toString()
+        val email = binding.etvUser.text.toString()
+        val password = binding.etvPassword.text.toString()
         if (email.isEmpty() || password.isEmpty()) {
             return
         }
@@ -121,13 +119,11 @@ class LoginFragment : Fragment() {
                         db.collection("usersCollection").add(user)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    auth.currentUser?.let { it1 ->
-                                        (activity as MainActivity).getUserDetails(
-                                            it1
-                                        )
+                                    auth.currentUser?.let { user ->
+                                        (activity as MainActivity).getUserDetails(user)
                                     }
                                     findNavController().navigate(R.id.action_loginFragment_to_account_fragment)
-                                    //(activity as MainActivity).switchFragment(StartFragment())
+
                                 } else {
                                     Snackbar.make(view, getString(R.string.errorSignUp), 2000)
                                         .show()
@@ -139,30 +135,6 @@ class LoginFragment : Fragment() {
                     Snackbar.make(view, getText(R.string.errorSignUp), 2000).show()
                 }
             }
-    }
-
-    private fun getCurrentUserInfo() {
-        val user = auth.currentUser
-        if(user != null) {
-            db.collection("usersCollection").get().addOnSuccessListener {DocumentSnapshot ->
-                for(document in DocumentSnapshot) {
-                    if(document.get("userID").toString() == user.uid) {
-                        Log.d("!!!", "Got it!")
-                        val user = document.toObject<User>()
-                        currentUser.name = user.name
-                        currentUser.userID = user.userID
-                        currentUser.userImage = user.userImage
-                        currentUser.location = user.location
-                        currentUser.documentId = user.documentId
-                        Log.d("!!!", currentUser.documentId.toString())
-                        return@addOnSuccessListener
-                    }
-                }
-                Log.d("!!!", "user not found!")
-            }
-        }
-
-
     }
 
     companion object {

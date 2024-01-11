@@ -159,7 +159,17 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dividerTwo" />
-
+            <TextView
+                android:id="@+id/tvSummaryReviewTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:text="@{viewModel.reviewTitle}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rbSummaryStars"
+                tools:layout_editor_absoluteY="464dp" />
             <TextView
                 android:id="@+id/tvSummaryReview"
                 android:layout_width="0dp"
@@ -169,8 +179,9 @@
                 android:text="@{viewModel.review}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rbSummaryStars"
+                app:layout_constraintTop_toBottomOf="@+id/tvSummaryReviewTitle"
                 tools:layout_editor_absoluteY="464dp" />
+
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/dividerThree"

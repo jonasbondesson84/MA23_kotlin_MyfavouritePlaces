@@ -33,16 +33,8 @@ class SharedViewModel : ViewModel() {
     val imageUri: MutableLiveData<Uri?> = _imageURI
     private val _imageURL = MutableLiveData<String?>()
     val imageURL: MutableLiveData<String?> = _imageURL
-    private val _photos = MutableLiveData<List<PlaceImages>?>()
-    val photos: MutableLiveData<List<PlaceImages>?> = _photos
 
-    init {
-        getPhotos()
-    }
 
-    private fun getPhotos() {
-
-    }
     fun resetValues() {
         _docID.value = null
         _title.value = null
@@ -57,7 +49,7 @@ class SharedViewModel : ViewModel() {
         _author.value = null
         _imageURI.value = null
         _imageURL.value = null
-        _photos.value = null
+
     }
 
     fun resetReview() {

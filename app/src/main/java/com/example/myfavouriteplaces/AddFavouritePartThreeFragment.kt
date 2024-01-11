@@ -26,10 +26,9 @@ class AddFavouritePartThreeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val sharedViewModel: SharedViewModel by activityViewModels()
-//    private lateinit var etvReview: EditText
-//    private lateinit var rbStars: RatingBar
     private var _binding: FragmentAddFavouritePartThreeBinding? = null
     val binding get() = _binding!!
+
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -55,24 +54,16 @@ class AddFavouritePartThreeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        //val view = inflater.inflate(R.layout.fragment_add_favourite_part_three, container, false)
         _binding = FragmentAddFavouritePartThreeBinding.inflate(inflater,container,false)
-//        val topAppBar = view.findViewById<MaterialToolbar>(R.id.topAddPartThree)
-//        val btnCancel = view.findViewById<Button>(R.id.btnAddPartThreeCancel)
-//        val btnNext = view.findViewById<Button>(R.id.btnAddPartThreeNext)
-//        val btnSkip = view.findViewById<Button>(R.id.btnAddSkipReview)
-//        etvReview = view.findViewById(R.id.etvAddReview)
-//        rbStars = view.findViewById(R.id.rbAddStars)
         binding.etvAddReview.addTextChangedListener(textWatcher)
 
         binding.topAddPartThree.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            findNavController().navigateUp()
         }
 
         binding.rbAddStars.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             sharedViewModel.setStars(binding.rbAddStars.rating)
         }
-
 
         binding.btnAddPartThreeCancel.setOnClickListener {
             findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_favourites_fragment)
@@ -83,7 +74,6 @@ class AddFavouritePartThreeFragment : Fragment() {
                 sharedViewModel.setReview(binding.etvAddReview.text.toString())
                 sharedViewModel.setReviewTitle(binding.etvAddReviewTitle.text.toString())
                 sharedViewModel.setStars(binding.rbAddStars.rating)
-
                 findNavController().navigate(R.id.action_addFaouritePartThreeFragment_to_addFavouriteSummaryFragment)
             }
         }

@@ -14,7 +14,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.card.MaterialCardView
 
-class FavouritesAdapter (context: Context, val listOfFavourites: MutableList<Place>): RecyclerView.Adapter<FavouritesAdapter.ViewHolder>() {
+class FavouritesAdapter (context: Context, private val listOfFavourites: MutableList<Place>): RecyclerView.Adapter<FavouritesAdapter.ViewHolder>() {
 
     private val layoutInflater = LayoutInflater.from(context)
 
@@ -40,9 +40,6 @@ class FavouritesAdapter (context: Context, val listOfFavourites: MutableList<Pla
         val place = listOfFavourites[position]
         holder.tvTitle.text = place.title
         holder.tvDesc.text = place.description
-        holder.tvTitle.transitionName = place.title
-        holder.tvDesc.transitionName =  place.description
-        holder.imFavourite.transitionName = place.imageURL
         holder.card.transitionName = place.docID
         var requestOptions = RequestOptions()
         requestOptions = requestOptions.transforms(FitCenter(), RoundedCorners(16))

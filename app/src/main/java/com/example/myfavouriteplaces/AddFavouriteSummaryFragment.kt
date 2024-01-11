@@ -1,11 +1,9 @@
 package com.example.myfavouriteplaces
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -18,8 +16,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.storage
 
@@ -41,6 +39,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     private lateinit var googleMap: GoogleMap
     private lateinit var storage: FirebaseStorage
     private var showLoadingIcon = false
+    private lateinit var db: FirebaseFirestore
 
     private var _binding: FragmentAddFavouriteSummaryBinding? = null
     val binding get() = _binding!!
@@ -59,36 +58,24 @@ class AddFavouriteSummaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        //val view = inflater.inflate(R.layout.fragment_add_favourite_summary, container, false)
         _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater,container,false)
-
         storage = Firebase.storage
+        db = Firebase.firestore
+
         setIcon()
         getImageIfEdited()
         hideElements()
         enableButtons()
 
         binding.summaryMap.onCreate(savedInstanceState)
+
         binding.summaryMap.getMapAsync {googleMap ->
-            this.googleMap = googleMap
-            val latLng = sharedViewModel.lat.value?.let { sharedViewModel.lng.value?.let { it1 ->
-                LatLng(it,
-                    it1
-                )
-
-            } }
-            Log.d("!!!", latLng.toString())
-            val cameraUpdate = latLng?.let { CameraUpdateFactory.newLatLngZoom(it, 15f) }
-            if (cameraUpdate != null) {
-                googleMap.moveCamera(cameraUpdate)
-                googleMap.addMarker(MarkerOptions().position(latLng))
-            }
-
-            }
+            setMap(googleMap)
+        }
 
         binding.topSummary.setNavigationOnClickListener {
             if(!showLoadingIcon) {
-                activity?.onBackPressed()
+                findNavController().navigateUp()
             }
         }
 
@@ -100,13 +87,23 @@ class AddFavouriteSummaryFragment : Fragment() {
 
         binding.btnSummarySave.setOnClickListener {
             if(!showLoadingIcon) {
-                Log.d("!!!", sharedViewModel.docID.value.toString())
                 saveImage(binding.root)
-
             }
         }
 
         return binding.root
+    }
+
+    private fun setMap(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        val latLng = sharedViewModel.lat.value?.let { sharedViewModel.lng.value?.let { it1 ->
+            LatLng(it, it1)
+        } }
+        val cameraUpdate = latLng?.let { CameraUpdateFactory.newLatLngZoom(it, 15f) }
+        if (cameraUpdate != null) {
+            googleMap.moveCamera(cameraUpdate)
+            googleMap.addMarker(MarkerOptions().position(latLng))
+        }
     }
 
     private fun getImageIfEdited() {
@@ -158,7 +155,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         } else {
             binding.imCategory.setImageResource(R.drawable.baseline_ballot_24)
         }
-
+        iconsArray.recycle()
     }
 
     private fun saveImage(view:View) {
@@ -168,45 +165,25 @@ class AddFavouriteSummaryFragment : Fragment() {
             val filePath = sharedViewModel.imageUri.value
             val storageRef = storage.reference.child("images").child(fileName)
 
-            // Upload the image to Firebase Storage
             filePath?.let { storageRef.putFile(it) }?.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         val downloadUrl = uri.toString()
-                        Log.d("MainActivity", "Download URL: $downloadUrl")
-
-                        Toast.makeText(
-                            requireContext(),
-                            "Image uploaded successfully",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
                         sharedViewModel.setImageURL(downloadUrl)
-                        if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
-                            editPost(binding.root)
-                        } else {  //if it is a new post, it saves a new
-                            savePlace(binding.root)
-                        }
-                        // You can save the downloadUrl or use it to display the image later
+                        savePlaceInfo(view)
                     }
                 } else {
                     // Image upload failed
-                    Log.d("!!!", "failed")
-                    val exception = task.exception
-                    // Handle the exception
+                    Snackbar.make(view, getString(R.string.errorImageUpload), 2000).show()
+                    enableButtons()
                 }
-
             }
-        } else { //if you havent selected an image you just saves the place to firebase
-            if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
-                editPost(binding.root)
-            } else {  //if it is a new post, it saves a new
-                savePlace(binding.root)
-            }
+        } else { //if you haven't selected an image you just saves the place to firebase
+            savePlaceInfo(view)
         }
     }
-    private fun savePlace(view: View) {
-        val db = Firebase.firestore
+
+    private fun savePlaceInfo(view: View) {
         val place = Place(
             title = sharedViewModel.title.value,
             description = sharedViewModel.description.value,
@@ -216,45 +193,34 @@ class AddFavouriteSummaryFragment : Fragment() {
             public = sharedViewModel.sharePublic.value,
             lat = sharedViewModel.lat.value,
             lng = sharedViewModel.lng.value,
-            author = currentUser.userID,
+            author = CurrentUser.userID,
             imageURL = sharedViewModel.imageURL.value,
             reviewTitle = sharedViewModel.reviewTitle.value
-
-
         )
-        db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(place)
+        if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
+            editPost(view, place)
+        } else {  //if it is a new post, it saves a new
+            savePlace(view, place)
+        }
+    }
+
+    private fun savePlace(view: View, place: Place) {
+        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").add(place)
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
-                    //getFavourites(view)
                     (activity as MainActivity).getUserFavourites()
                     enableButtons()
                     findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
-                    //(activity as MainActivity).switchFragment(FavouriteFragment())
                 } else {
                     Snackbar.make(view, "Error", 2000).show()
                 }
             }
     }
 
-    private fun editPost(view: View) {
-        val db = Firebase.firestore
-        val place = Place(
-            title = sharedViewModel.title.value,
-            description = sharedViewModel.description.value,
-            category = sharedViewModel.category.value,
-            stars = sharedViewModel.stars.value,
-            review = sharedViewModel.review.value,
-            public = sharedViewModel.sharePublic.value,
-            lat = sharedViewModel.lat.value,
-            lng = sharedViewModel.lng.value,
-            author = currentUser.userID,
-            imageURL = sharedViewModel.imageURL.value,
-            reviewTitle = sharedViewModel.reviewTitle.value
+    private fun editPost(view: View, place: Place) {
 
-
-        )
         sharedViewModel.docID.value?.let {
-            db.collection("users").document(currentUser.userID.toString()).collection("favourites").document(
+            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").document(
                 it
             ).update("title", place.title,
                 "description", place.description,
@@ -269,35 +235,13 @@ class AddFavouriteSummaryFragment : Fragment() {
                 .addOnCompleteListener {task ->
                     if(task.isSuccessful) {
                         (activity as MainActivity).getUserFavourites()
-                        //getFavourites(view)
                         enableButtons()
                         findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
-                        //(activity as MainActivity).switchFragment(FavouriteFragment())
                     } else {
                         Snackbar.make(view, "Error", 2000).show()
                     }
                 }
         }
-
-    }
-    private fun getFavourites(view: View) {
-        val user = currentUser
-        currentUser.favouritesList.clear()
-        val db = Firebase.firestore
-
-            db.collection("users").document(user.userID.toString()).collection("favourites").get()
-                .addOnSuccessListener { documentSnapshot ->
-                    for (document in documentSnapshot.documents) {
-                        val place = document.toObject<Place>()
-                        if (place != null) {
-                            currentUser.favouritesList.add(place)
-                        }
-                    }
-
-                }
-
-
-
     }
 
     private fun disableButtons() {
