@@ -10,16 +10,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
+import com.example.myfavouriteplaces.databinding.FragmentFavouritesBinding
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,9 +32,11 @@ class FavouritesFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var rvFavourites: RecyclerView
-    private lateinit var fabAdd: FloatingActionButton
     private val sharedViewModel: SharedViewModel by activityViewModels()
+
+    private var _binding: FragmentFavouritesBinding? = null
+    val binding get() = _binding!!
+
 
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
@@ -56,26 +55,22 @@ class FavouritesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_favourites, container, false)
+        //val view = inflater.inflate(R.layout.fragment_favourites, container, false)
+        _binding = FragmentFavouritesBinding.inflate(inflater, container, false)
 
-        rvFavourites = view.findViewById(R.id.rvFavourites)
-        fabAdd = view.findViewById(R.id.fabAddFavourite)
         db = Firebase.firestore
         auth = Firebase.auth
 
 
         postponeEnterTransition()
-        view.doOnPreDraw { startPostponedEnterTransition() }
+        binding.root.doOnPreDraw { startPostponedEnterTransition() }
 
-        rvFavourites.layoutManager = GridLayoutManager(view.context,2 )
-        adapter = FavouritesAdapter(view.context, currentUser.favouritesList)
-        rvFavourites.adapter = adapter
+        binding.rvFavourites.layoutManager = GridLayoutManager(binding.root.context,2 )
+        adapter = FavouritesAdapter(binding.root.context, CurrentUser.favouritesList)
+        binding.rvFavourites.adapter = adapter
 
         sharedViewModel.resetValues()
-        //getFavourites(view)
-        if (currentUser.userID == null) {
-            fabAdd.visibility = View.INVISIBLE
-        }
+        showFAB()
 
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
             duration = 1000
@@ -85,61 +80,45 @@ class FavouritesFragment : Fragment() {
         }
 
         adapter.onCardClick = {place, card->
-
-//            exitTransition = MaterialElevationScale(false).apply {
-//                duration = 2000
-//            }
-//            reenterTransition = MaterialElevationScale(true).apply {
-//                duration = 2000
-//            }
-            val cardID = place.docID
             val placeID = place.docID
             sharedViewModel.setPlace(place)
             val action = FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(placeID)
-
-            if(cardID != null) {
-                val extra = FragmentNavigatorExtras(card to cardID)
+            if(placeID != null) {
+                val extra = FragmentNavigatorExtras(card to placeID)
                 findNavController().navigate(action,extra)
             }
-
         }
 
-        fabAdd.setOnClickListener {
-
+        binding.fabAddFavourite.setOnClickListener {
             sharedViewModel.resetValues()
-            val extras = FragmentNavigatorExtras(fabAdd to "fabToScreen")
+            val extras = FragmentNavigatorExtras(binding.fabAddFavourite to "fabToScreen")
             findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment, null, null, extras)
         }
 
-        return view
+        return binding.root
+    }
+
+    private fun showFAB() {
+        if (CurrentUser.userID == null) {
+            binding.fabAddFavourite.visibility = View.INVISIBLE
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.apply {
+            viewModel = sharedViewModel
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onResume() {
         super.onResume()
         adapter.notifyDataSetChanged()
-    }
-    private fun getFavourites(view: View) {
-        val user = currentUser
-        currentUser.favouritesList.clear()
-
-        if (user.userID == null) {
-            fabAdd.visibility = View.INVISIBLE
-            Snackbar.make(view, getString(R.string.mustBeSignedIn), 2000).show()
-            return
-        } else {
-            db.collection("users").document(user.userID.toString()).collection("favourites").get()
-                .addOnSuccessListener { documentSnapshot ->
-                    for (document in documentSnapshot.documents) {
-                        val place = document.toObject<Place>()
-                        if (place != null) {
-                            currentUser.favouritesList.add(place)
-                        }
-                    }
-                    adapter.notifyDataSetChanged()
-                }
-
-        }
-
     }
 
     companion object {

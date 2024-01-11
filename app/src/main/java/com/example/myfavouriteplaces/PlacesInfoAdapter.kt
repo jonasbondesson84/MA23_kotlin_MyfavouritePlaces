@@ -35,6 +35,7 @@ class PlacesInfoAdapter(val context: Context): GoogleMap.InfoWindowAdapter {
         } else {
             imImage.setImageResource(R.drawable.baseline_ballot_24)
         }
+        iconsArray.recycle()
 
         return infoWindow
     }

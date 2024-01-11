@@ -8,5 +8,4 @@ class User(@DocumentId var documentId : String? = null,
            var location: String? = null,
            var userImage: String? = null,
 
-           ) {
-}
+           )

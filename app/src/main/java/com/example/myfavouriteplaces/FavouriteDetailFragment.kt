@@ -2,7 +2,6 @@ package com.example.myfavouriteplaces
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,23 +65,11 @@ class FavouriteDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        //val view = inflater.inflate(R.layout.fragment_favourite_detail, container, false)
         _binding = FragmentFavouriteDetailBinding.inflate(inflater, container, false)
         db = Firebase.firestore
         auth = Firebase.auth
-
-
-
         val place = args
-//        if (placeID != null) {
-//            getPlace(placeID)
-//        } else {
-//            Snackbar.make(binding.root, "Error, favourite place not found.", 2000).show()
-//        }
         currentPlace = sharedViewModel.getPlace()
-        binding.tvFavouriteTitle.transitionName = sharedViewModel.title.value
-        binding.tvFavouriteDescription.transitionName = sharedViewModel.description.value
-        binding.imFavouriteImage.transitionName = sharedViewModel.imageURL.value
 
         binding.card.transitionName = place.placeID
 
@@ -94,32 +81,17 @@ class FavouriteDetailFragment : Fragment() {
         }
 
         hideSaveIcon()
-
         getImage()
         setIcon()
         setAuthorDetails()
 
         binding.fabGoToMap.setOnClickListener {
-            Log.d("!!!", currentPlace!!.lng.toString())
-            if(currentPlace != null) {
-                val lat = currentPlace!!.lat?.toFloat()
-                val lng = currentPlace!!.lng?.toFloat()
-                val action = lat?.let { it1 ->
-                    lng?.let { it2->
-                    FavouriteDetailFragmentDirections.actionFavouriteDetailFragmentToMapsFragment(
-                        it1, it2
-                    )
-                }
-            }
-                Log.d("!!!", action.toString())
-                if (action != null) {
-                    findNavController().navigate(action)
-                }
-            }
+            goToMap()
+
         }
 
         binding.topAppBarDetails.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            findNavController().navigateUp()
         }
 
         binding.topAppBarDetails.setOnMenuItemClickListener {menuItem ->
@@ -131,7 +103,6 @@ class FavouriteDetailFragment : Fragment() {
                     true
                 }
                 R.id.menuEditFavourite -> {
-
                         editPlace()
                     true
                 }
@@ -141,10 +112,26 @@ class FavouriteDetailFragment : Fragment() {
                 }
                 else -> false
             }
-
         }
 
         return binding.root
+    }
+
+    private fun goToMap() {
+        if(currentPlace != null) {
+            val lat = currentPlace!!.lat?.toFloat()
+            val lng = currentPlace!!.lng?.toFloat()
+            val action = lat?.let { it1 ->
+                lng?.let { it2->
+                    FavouriteDetailFragmentDirections.actionFavouriteDetailFragmentToMapsFragment(
+                        it1, it2
+                    )
+                }
+            }
+            if (action != null) {
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun setAuthorDetails() {
@@ -165,9 +152,7 @@ class FavouriteDetailFragment : Fragment() {
                             .placeholder(R.drawable.baseline_image_not_supported_24)
                             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                             .into(binding.imAuthor)
-//
                     }
-
                 }
         }
     }
@@ -178,7 +163,7 @@ class FavouriteDetailFragment : Fragment() {
     }
 
     private fun hideSaveIcon() {
-            if(currentPlace?.author == currentUser.userID) {
+            if(currentPlace?.author == CurrentUser.userID) {
                 val icon = binding.topAppBarDetails.menu.getItem(0)
                 icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
                 isSavable = false
@@ -190,8 +175,8 @@ class FavouriteDetailFragment : Fragment() {
 
     private fun saveShared() {
         val savePlace = sharedViewModel.getPlace()
-        savePlace.author = currentUser.userID
-        db.collection("users").document(currentUser.userID.toString()).collection("favourites").add(savePlace)
+        savePlace.author = CurrentUser.userID
+        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").add(savePlace)
             .addOnCompleteListener {task ->
                 if(task.isSuccessful) {
                     Snackbar.make(binding.root, getString(R.string.savedPlace), 2000).show()
@@ -214,13 +199,13 @@ class FavouriteDetailFragment : Fragment() {
         } else {
             binding.imDetailsCategory.setImageResource(R.drawable.baseline_ballot_24)
         }
+        iconsArray.recycle()
 
     }
 
     private fun getImage() {
         Glide.with(this)
             .load(currentPlace?.imageURL.toString())
-            //.apply(requestOptions)
             .placeholder(R.drawable.baseline_image_not_supported_24)
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .into(binding.imFavouriteImage)
@@ -237,31 +222,13 @@ class FavouriteDetailFragment : Fragment() {
         _binding = null
     }
 
-    private fun getPlace(placeID: String) {
-        currentPlace = sharedViewModel.getPlace()
-        Log.d("!!!", currentPlace!!.description.toString())
-        currentPlace.let { it->
-            if (it != null) {
-                if(it.reviewTitle.isNullOrEmpty()) {
-                    binding.rbDetailsStars.visibility = View.INVISIBLE
-                }
-
-            } else {
-                binding.rbDetailsStars.visibility= View.INVISIBLE
-            }
-        }
-
-    }
-
     private fun showDeleteDialog() {
         context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle(resources.getString(R.string.warning))
                 .setMessage(resources.getString(R.string.deleteDesc))
-
                 .setNegativeButton(resources.getString(R.string.no)) { dialog, which ->
                     // Respond to negative button press
-
                 }
                 .setPositiveButton(resources.getString(R.string.yes)) { dialog, which ->
                     // Respond to positive button press
@@ -273,13 +240,12 @@ class FavouriteDetailFragment : Fragment() {
 
     private fun deleteItem() {
         currentPlace?.docID?.let {
-            db.collection("users").document(currentUser.userID.toString()).collection(
+            db.collection("users").document(CurrentUser.userID.toString()).collection(
                 "favourites"
             ).document(it).delete().addOnCompleteListener {task ->
                 if(task.isSuccessful) {
                     (activity as MainActivity).getUserFavourites()
                     findNavController().navigate(R.id.action_favouriteDetailFragment_to_favourites_fragment)
-                    //(activity as MainActivity).switchFragment(FavouriteFragment())
                 }
             }
         }

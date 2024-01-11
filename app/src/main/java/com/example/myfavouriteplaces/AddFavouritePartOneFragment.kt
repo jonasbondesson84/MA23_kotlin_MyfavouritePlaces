@@ -48,9 +48,8 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
 
 }
 
-    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         // Handle the returned Uri
-        Log.d("!!!", "uri = $uri")
         binding.imSelectedImage.setImageURI(uri)
         if (uri != null) {
             sharedViewModel.setImageUri(uri)
@@ -72,32 +71,19 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        //val view = inflater.inflate(R.layout.fragment_add_favourite_part_one, container, false)
         _binding = FragmentAddFavouritePartOneBinding.inflate(inflater,container,false)
-
-        binding.etvAddTitle.addTextChangedListener(textWatcher)
-
         sharedElementEnterTransition = MaterialContainerTransform()
 
-//        enterTransition = MaterialContainerTransform().apply {
-//            startView = requireActivity().findViewById(R.id.fabAddFavourite)
-//            endView = view
-//            duration = 1000
-//            scrimColor = Color.TRANSPARENT
-//            containerColor = resources.getColor(R.color.md_theme_primary)
-//            startContainerColor = resources.getColor(R.color.md_theme_secondary)
-//            endContainerColor = resources.getColor(R.color.md_theme_surface)
-//        }
-//
-//        returnTransition = Slide().apply {
-//            duration = 500
-//            addTarget(R.id.cardAddFavourite)
-//        }
+        createSpinner()
+        getImageIfEdit()
+
+        binding.etvAddTitle.addTextChangedListener(textWatcher)
+        binding.spCategory.onItemSelectedListener = this
 
         binding.btnAddPartOneCancel.setOnClickListener {
             findNavController().navigateUp()
-//            findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_favourites_fragment)
         }
+
         binding.btnAddPartOneNext.setOnClickListener {
             if (binding.etvAddTitle.text.isNotEmpty()) {
                 sharedViewModel.setTitle(binding.etvAddTitle.text.toString())
@@ -105,19 +91,15 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
                 findNavController().navigate(R.id.action_addFavouritePartOneFragment_to_addFavouritePartTwoFragment)
             }
         }
+
         binding.fabAddImage.setOnClickListener {
             getContent.launch("image/*")
         }
 
-        createSpinner()
-        getImageIfEdit()
-
-
         binding.topAddPart1.setNavigationOnClickListener {
-            activity?.onBackPressed()
+            findNavController().navigateUp()
         }
 
-        binding.spCategory.onItemSelectedListener = this
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -157,15 +139,14 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
             R.array.categories_array,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
-            // Specify the layout to use when the list of choices appears.
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner.
             binding.spCategory.adapter = adapter
             if(sharedViewModel.category.value != null) {
                 binding.spCategory.setSelection(adapter.getPosition(sharedViewModel.category.value))
             }
         }
     }
+
     private fun getImageIfEdit() {
         if(sharedViewModel.imageURL.value != null) {
             Glide
@@ -175,10 +156,6 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.imSelectedImage)
         }
-    }
-
-    private fun setSpinnerIfEdit() {
-
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

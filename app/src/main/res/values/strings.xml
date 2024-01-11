@@ -53,6 +53,7 @@
     <string name="welcome">Welcome to My favourite places!</string>
     <string name="accountLoggedIn">Email: %1$s</string>
     <string name="appInfo">Here you can add your own favourite places and see others shared favourite places.</string>
+    <string name="errorImageUpload">There was an error uploading the image, try agin.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

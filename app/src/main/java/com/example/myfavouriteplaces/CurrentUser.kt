@@ -2,7 +2,7 @@ package com.example.myfavouriteplaces
 
 import com.google.android.gms.maps.model.LatLng
 
-object currentUser {
+object CurrentUser {
     var documentId : String? = null
     var userID: String? = null
     var name: String? = null
