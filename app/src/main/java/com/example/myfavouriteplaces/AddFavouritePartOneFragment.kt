@@ -37,24 +37,25 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
     private val textWatcher = object : TextWatcher {
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        val title = binding.etvAddTitle.text.toString()
-        binding.btnAddPartOneNext.isEnabled = title.isNotEmpty()
-    }
-
-    override fun afterTextChanged(s: Editable?) {}
-
-}
-
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        // Handle the returned Uri
-        binding.imSelectedImage.setImageURI(uri)
-        if (uri != null) {
-            sharedViewModel.setImageUri(uri)
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            val title = binding.etvAddTitle.text.toString()
+            binding.btnAddPartOneNext.isEnabled = title.isNotEmpty()
         }
+
+        override fun afterTextChanged(s: Editable?) {}
+
     }
+
+    private val getContent =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            // Handle the returned Uri
+            binding.imSelectedImage.setImageURI(uri)
+            if (uri != null) {
+                sharedViewModel.setImageUri(uri)
+            }
+        }
     private var _binding: FragmentAddFavouritePartOneBinding? = null
     val binding get() = _binding!!
 
@@ -71,7 +72,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentAddFavouritePartOneBinding.inflate(inflater,container,false)
+        _binding = FragmentAddFavouritePartOneBinding.inflate(inflater, container, false)
         sharedElementEnterTransition = MaterialContainerTransform()
 
         createSpinner()
@@ -102,6 +103,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
 
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
@@ -133,6 +135,7 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
                 }
             }
     }
+
     private fun createSpinner() {
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -141,14 +144,14 @@ class AddFavouritePartOneFragment : Fragment(), AdapterView.OnItemSelectedListen
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spCategory.adapter = adapter
-            if(sharedViewModel.category.value != null) {
+            if (sharedViewModel.category.value != null) {
                 binding.spCategory.setSelection(adapter.getPosition(sharedViewModel.category.value))
             }
         }
     }
 
     private fun getImageIfEdit() {
-        if(sharedViewModel.imageURL.value != null) {
+        if (sharedViewModel.imageURL.value != null) {
             Glide
                 .with(this)
                 .load(sharedViewModel.imageURL.value)

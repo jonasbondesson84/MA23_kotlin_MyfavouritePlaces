@@ -49,7 +49,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.bottom_nav)
-        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         auth = Firebase.auth
         db = Firebase.firestore
@@ -65,27 +66,30 @@ class MainActivity : AppCompatActivity() {
             bottomNav, navController
         )
 
-        bottomNav.setOnNavigationItemSelectedListener {item ->
-            when(item.itemId) { 
+        bottomNav.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
                 R.id.home_fragment -> {
                     setNavTransition()
                     navController.navigate(R.id.home_fragment)
                     true
                 }
+
                 R.id.favourites_fragment -> {
                     setNavTransition()
                     navController.navigate(R.id.favourites_fragment)
                     true
                 }
+
                 R.id.maps_fragment -> {
                     setNavTransition()
                     //moveToMaps()
                     navController.navigate(R.id.maps_fragment)
                     true
                 }
+
                 R.id.account_fragment -> {
                     setNavTransition()
-                    if(auth.currentUser == null) {
+                    if (auth.currentUser == null) {
                         navController.navigate(R.id.loginFragment)
                         true
                     } else {
@@ -93,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
                 }
+
                 else -> false
             }
         }
@@ -111,26 +116,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkIfLocationGrated() {
-        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION)
+                REQUEST_LOCATION
+            )
         }
     }
 
     private fun checkIfUserIsLoggedIn() {
         val user = auth.currentUser
-        if(user != null) {
+        if (user != null) {
             getUserDetails(user)
         }
         getLastLocation()
     }
 
     fun getUserDetails(user: FirebaseUser) {
-        db.collection("usersCollection").get().addOnSuccessListener {documentSnapshot ->
-            for(document in documentSnapshot) {
-                if(document.get("userID").toString() == user.uid) {
+        db.collection("usersCollection").get().addOnSuccessListener { documentSnapshot ->
+            for (document in documentSnapshot) {
+                if (document.get("userID").toString() == user.uid) {
                     Log.d("!!!", "Got it!")
                     val newUser = document.toObject<User>()
                     CurrentUser.name = newUser.name
@@ -148,12 +159,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-     fun getUserFavourites() {
+    fun getUserFavourites() {
         CurrentUser.favouritesList.clear()
         if (CurrentUser.userID == null) {
             return
         } else {
-            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").get()
+            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites")
+                .get()
                 .addOnSuccessListener { documentSnapshot ->
                     for (document in documentSnapshot.documents) {
                         val place = document.toObject<Place>()
@@ -169,12 +181,12 @@ class MainActivity : AppCompatActivity() {
         db.collection("usersCollection").get().addOnSuccessListener { documentSnapshot ->
             for (document in documentSnapshot) {
                 val user = document.get("userID").toString()
-                if(user != null) {
+                if (user != null) {
                     db.collection("users").document(user).collection("favourites").get()
                         .addOnSuccessListener {
-                            for(document in it) {
+                            for (document in it) {
                                 val place = document.toObject<Place>()
-                                if(place != null  && place.public == true && place.author != CurrentUser.userID) {
+                                if (place != null && place.public == true && place.author != CurrentUser.userID) {
                                     CurrentUser.sharedFavouritesList.add(place)
                                     Log.d("!!!", "place: ${place.docID}")
                                 }
@@ -186,10 +198,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getLastLocation() {
-        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-            locationProvider.lastLocation.addOnCompleteListener {task->
-                if(task.isSuccessful) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationProvider.lastLocation.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     val location = task.result
                     if (location != null) {
                         lat = location.latitude
@@ -211,8 +227,8 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == REQUEST_LOCATION) {
-            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == REQUEST_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getLastLocation()
             }
         }

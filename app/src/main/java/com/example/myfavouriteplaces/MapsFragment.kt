@@ -66,17 +66,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getLatLng() {
-            lat = args.lat.toDouble()
-            lng = args.lng.toDouble()
-            if (lat == 0.0 || lat == null) {
-                lat = CurrentUser.latLng?.latitude
-                lng = CurrentUser.latLng?.longitude
-                if (lat == null) {
-                    lat = 59.334591
-                    lng = 18.063240
-                }
-
+        lat = args.lat.toDouble()
+        lng = args.lng.toDouble()
+        if (lat == 0.0 || lat == null) {
+            lat = CurrentUser.latLng?.latitude
+            lng = CurrentUser.latLng?.longitude
+            if (lat == null) {
+                lat = 59.334591
+                lng = 18.063240
             }
+
+        }
 
     }
 
@@ -105,15 +105,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             if (placeID != null) {
                 findNavController().navigate(action)
             }
-    }
+        }
     }
 
     private fun createMarksFavourites(map: GoogleMap) {
-        for(place in CurrentUser.favouritesList) {
-            place.lat?.let {it1 ->
-                place.lng?.let {it2 ->
+        for (place in CurrentUser.favouritesList) {
+            place.lat?.let { it1 ->
+                place.lng?.let { it2 ->
                     val position = LatLng(it1, it2)
-                    val marker = map.addMarker(MarkerOptions().position(position).title(place.title))
+                    val marker =
+                        map.addMarker(MarkerOptions().position(position).title(place.title))
                     marker?.tag = place
                 }
             }
@@ -123,13 +124,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private fun createMarksShared(map: GoogleMap) {
 
-        for(place in CurrentUser.sharedFavouritesList) {
-            place.lat?.let {it1 ->
-                place.lng?.let {it2 ->
+        for (place in CurrentUser.sharedFavouritesList) {
+            place.lat?.let { it1 ->
+                place.lng?.let { it2 ->
                     val position = LatLng(it1, it2)
-                    val marker = map.addMarker(MarkerOptions().position(position).title(place.title).icon(
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-                    ))
+                    val marker = map.addMarker(
+                        MarkerOptions().position(position).title(place.title).icon(
+                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+                        )
+                    )
                     marker?.tag = place
                 }
             }

@@ -94,22 +94,25 @@ class FavouriteDetailFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.topAppBarDetails.setOnMenuItemClickListener {menuItem ->
+        binding.topAppBarDetails.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.menuSavePlace -> {
-                    if(isSavable) {
+                    if (isSavable) {
                         saveShared()
                     }
                     true
                 }
+
                 R.id.menuEditFavourite -> {
-                        editPlace()
+                    editPlace()
                     true
                 }
+
                 R.id.menuDeleteFavourite -> {
                     showDeleteDialog()
                     true
                 }
+
                 else -> false
             }
         }
@@ -118,11 +121,11 @@ class FavouriteDetailFragment : Fragment() {
     }
 
     private fun goToMap() {
-        if(currentPlace != null) {
+        if (currentPlace != null) {
             val lat = currentPlace!!.lat?.toFloat()
             val lng = currentPlace!!.lng?.toFloat()
             val action = lat?.let { it1 ->
-                lng?.let { it2->
+                lng?.let { it2 ->
                     FavouriteDetailFragmentDirections.actionFavouriteDetailFragmentToMapsFragment(
                         it1, it2
                     )
@@ -138,14 +141,15 @@ class FavouriteDetailFragment : Fragment() {
         val authorID = sharedViewModel.author.value
         if (authorID != null) {
             db.collection("usersCollection").whereEqualTo("userID", authorID).get()
-                .addOnSuccessListener {document->
+                .addOnSuccessListener { document ->
                     val authorName = document.documents[0].data?.get("name").toString()
                     val authorImage = document.documents[0].data?.get("userImage").toString()
 
-                    if(document != null) {
+                    if (document != null) {
                         binding.tvAuthor.text = authorName
                         var requestOptions = RequestOptions()
-                        requestOptions = requestOptions.transforms(CenterCrop(), RoundedCorners(50), Rotate(270))
+                        requestOptions =
+                            requestOptions.transforms(CenterCrop(), RoundedCorners(50), Rotate(270))
                         Glide.with(this)
                             .load(authorImage)
                             .apply(requestOptions)
@@ -163,22 +167,23 @@ class FavouriteDetailFragment : Fragment() {
     }
 
     private fun hideSaveIcon() {
-            if(currentPlace?.author == CurrentUser.userID) {
-                val icon = binding.topAppBarDetails.menu.getItem(0)
-                icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
-                isSavable = false
-            } else {
-                binding.topAppBarDetails.menu.removeItem(R.id.menuEditFavourite)
-                binding.topAppBarDetails.menu.removeItem(R.id.menuDeleteFavourite)
-            }
+        if (currentPlace?.author == CurrentUser.userID) {
+            val icon = binding.topAppBarDetails.menu.getItem(0)
+            icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
+            isSavable = false
+        } else {
+            binding.topAppBarDetails.menu.removeItem(R.id.menuEditFavourite)
+            binding.topAppBarDetails.menu.removeItem(R.id.menuDeleteFavourite)
+        }
     }
 
     private fun saveShared() {
         val savePlace = sharedViewModel.getPlace()
         savePlace.author = CurrentUser.userID
-        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").add(savePlace)
-            .addOnCompleteListener {task ->
-                if(task.isSuccessful) {
+        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites")
+            .add(savePlace)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     Snackbar.make(binding.root, getString(R.string.savedPlace), 2000).show()
                     val icon = binding.topAppBarDetails.menu.getItem(0)
                     icon.icon = resources.getDrawable(R.drawable.baseline_favorite_24)
@@ -193,7 +198,7 @@ class FavouriteDetailFragment : Fragment() {
         val iconsArray = resources.obtainTypedArray(R.array.categories_icons)
         val categoryArray = resources.getStringArray(R.array.categories_array)
         val categoryIndex = categoryArray.indexOf(sharedViewModel.category.value)
-        if(categoryIndex != -1) {
+        if (categoryIndex != -1) {
             val icon = iconsArray.getResourceId(categoryIndex, -1)
             binding.imDetailsCategory.setImageResource(icon)
         } else {
@@ -217,6 +222,7 @@ class FavouriteDetailFragment : Fragment() {
             viewModel = sharedViewModel
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -242,8 +248,8 @@ class FavouriteDetailFragment : Fragment() {
         currentPlace?.docID?.let {
             db.collection("users").document(CurrentUser.userID.toString()).collection(
                 "favourites"
-            ).document(it).delete().addOnCompleteListener {task ->
-                if(task.isSuccessful) {
+            ).document(it).delete().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     (activity as MainActivity).getUserFavourites()
                     findNavController().navigate(R.id.action_favouriteDetailFragment_to_favourites_fragment)
                 }

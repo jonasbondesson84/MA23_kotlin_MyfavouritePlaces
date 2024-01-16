@@ -48,10 +48,10 @@ class AddFavouritePartTwoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentAddFavouritePartTwoBinding.inflate(inflater,container,false)
+        _binding = FragmentAddFavouritePartTwoBinding.inflate(inflater, container, false)
 
         binding.addLocationMap.onCreate(savedInstanceState)
-        binding.addLocationMap.getMapAsync {googleMap ->
+        binding.addLocationMap.getMapAsync { googleMap ->
             setMap(googleMap)
         }
 
@@ -64,7 +64,7 @@ class AddFavouritePartTwoFragment : Fragment() {
         }
 
         binding.btnAddPartTwoNext.setOnClickListener {
-            if(sharedViewModel.lat.value != null) {
+            if (sharedViewModel.lat.value != null) {
                 sharedViewModel.setSharePublic(binding.swPublic.isChecked)
                 findNavController().navigate(R.id.action_addFavouritePartTwoFragment_to_addFaouritePartThreeFragment)
             }
@@ -77,11 +77,14 @@ class AddFavouritePartTwoFragment : Fragment() {
     private fun setMap(googleMap: GoogleMap) {
         this.googleMap = googleMap
         var latLng = CurrentUser.latLng
-        if( latLng == null) {
-            latLng = LatLng(59.334591, 18.063240)  //If you cant get latlng from user, it sets to stockholm
+        if (latLng == null) {
+            latLng = LatLng(
+                59.334591,
+                18.063240
+            )  //If you cant get latlng from user, it sets to stockholm
         }
         var marker: Marker? = null
-        if(sharedViewModel.lat.value != null && sharedViewModel.lng.value != null) {
+        if (sharedViewModel.lat.value != null && sharedViewModel.lng.value != null) {
             latLng = LatLng(sharedViewModel.lat.value!!, sharedViewModel.lng.value!!)
             marker = googleMap.addMarker(MarkerOptions().position(latLng))
             binding.btnAddPartTwoNext.isEnabled = true
@@ -89,7 +92,7 @@ class AddFavouritePartTwoFragment : Fragment() {
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15f)
         googleMap.moveCamera(cameraUpdate)
 
-        googleMap.setOnMapClickListener {latLng ->
+        googleMap.setOnMapClickListener { latLng ->
             marker?.remove()
             marker = googleMap.addMarker(MarkerOptions().position(latLng))
             sharedViewModel.setLocation(latLng)
@@ -127,8 +130,8 @@ class AddFavouritePartTwoFragment : Fragment() {
         binding.addLocationMap.onLowMemory()
     }
 
-    private fun setSwitchIfEdit(){
-        if(sharedViewModel.sharePublic.value != null)
+    private fun setSwitchIfEdit() {
+        if (sharedViewModel.sharePublic.value != null)
             binding.swPublic.isChecked = sharedViewModel.sharePublic.value!!
     }
 

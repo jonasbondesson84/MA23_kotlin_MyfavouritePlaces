@@ -14,17 +14,20 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.card.MaterialCardView
 
-class FavouritesAdapter (context: Context, private val listOfFavourites: MutableList<Place>): RecyclerView.Adapter<FavouritesAdapter.ViewHolder>() {
+class FavouritesAdapter(context: Context, private val listOfFavourites: MutableList<Place>) :
+    RecyclerView.Adapter<FavouritesAdapter.ViewHolder>() {
 
     private val layoutInflater = LayoutInflater.from(context)
 
     var onCardClick: ((Place, MaterialCardView) -> Unit)? = null
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tvTitle: TextView = itemView.findViewById(R.id.tvFavouriteTitle)
         var tvDesc: TextView = itemView.findViewById(R.id.tvFavouriteDescription)
         var imFavourite: ImageView = itemView.findViewById(R.id.imFavouriteImage)
         var card: MaterialCardView = itemView.findViewById(R.id.card)
     }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

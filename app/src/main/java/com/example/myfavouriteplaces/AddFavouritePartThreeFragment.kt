@@ -54,7 +54,7 @@ class AddFavouritePartThreeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentAddFavouritePartThreeBinding.inflate(inflater,container,false)
+        _binding = FragmentAddFavouritePartThreeBinding.inflate(inflater, container, false)
         binding.etvAddReview.addTextChangedListener(textWatcher)
 
         binding.topAddPartThree.setNavigationOnClickListener {
@@ -70,7 +70,7 @@ class AddFavouritePartThreeFragment : Fragment() {
         }
 
         binding.btnAddPartThreeNext.setOnClickListener {
-            if(binding.etvAddReview.text.isNotEmpty()) {
+            if (binding.etvAddReview.text.isNotEmpty()) {
                 sharedViewModel.setReview(binding.etvAddReview.text.toString())
                 sharedViewModel.setReviewTitle(binding.etvAddReviewTitle.text.toString())
                 sharedViewModel.setStars(binding.rbAddStars.rating)
@@ -84,6 +84,7 @@ class AddFavouritePartThreeFragment : Fragment() {
 
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
