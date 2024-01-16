@@ -65,7 +65,7 @@ class FavouritesFragment : Fragment() {
         postponeEnterTransition()
         binding.root.doOnPreDraw { startPostponedEnterTransition() }
 
-        binding.rvFavourites.layoutManager = GridLayoutManager(binding.root.context,2 )
+        binding.rvFavourites.layoutManager = GridLayoutManager(binding.root.context, 2)
         adapter = FavouritesAdapter(binding.root.context, CurrentUser.favouritesList)
         binding.rvFavourites.adapter = adapter
 
@@ -79,20 +79,28 @@ class FavouritesFragment : Fragment() {
             duration = 1000
         }
 
-        adapter.onCardClick = {place, card->
+        adapter.onCardClick = { place, card ->
             val placeID = place.docID
             sharedViewModel.setPlace(place)
-            val action = FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(placeID)
-            if(placeID != null) {
+            val action =
+                FavouritesFragmentDirections.actionFavouritesFragmentToFavouriteDetailFragment(
+                    placeID
+                )
+            if (placeID != null) {
                 val extra = FragmentNavigatorExtras(card to placeID)
-                findNavController().navigate(action,extra)
+                findNavController().navigate(action, extra)
             }
         }
 
         binding.fabAddFavourite.setOnClickListener {
             sharedViewModel.resetValues()
             val extras = FragmentNavigatorExtras(binding.fabAddFavourite to "fabToScreen")
-            findNavController().navigate(R.id.action_favourites_fragment_to_addFavouritePartOneFragment, null, null, extras)
+            findNavController().navigate(
+                R.id.action_favourites_fragment_to_addFavouritePartOneFragment,
+                null,
+                null,
+                extras
+            )
         }
 
         return binding.root

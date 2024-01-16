@@ -58,7 +58,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater,container,false)
+        _binding = FragmentAddFavouriteSummaryBinding.inflate(inflater, container, false)
         storage = Firebase.storage
         db = Firebase.firestore
 
@@ -69,24 +69,24 @@ class AddFavouriteSummaryFragment : Fragment() {
 
         binding.summaryMap.onCreate(savedInstanceState)
 
-        binding.summaryMap.getMapAsync {googleMap ->
+        binding.summaryMap.getMapAsync { googleMap ->
             setMap(googleMap)
         }
 
         binding.topSummary.setNavigationOnClickListener {
-            if(!showLoadingIcon) {
+            if (!showLoadingIcon) {
                 findNavController().navigateUp()
             }
         }
 
         binding.btnSummaryCancel.setOnClickListener {
-            if(!showLoadingIcon) {
+            if (!showLoadingIcon) {
                 findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
             }
         }
 
         binding.btnSummarySave.setOnClickListener {
-            if(!showLoadingIcon) {
+            if (!showLoadingIcon) {
                 saveImage(binding.root)
             }
         }
@@ -96,9 +96,11 @@ class AddFavouriteSummaryFragment : Fragment() {
 
     private fun setMap(googleMap: GoogleMap) {
         this.googleMap = googleMap
-        val latLng = sharedViewModel.lat.value?.let { sharedViewModel.lng.value?.let { it1 ->
-            LatLng(it, it1)
-        } }
+        val latLng = sharedViewModel.lat.value?.let {
+            sharedViewModel.lng.value?.let { it1 ->
+                LatLng(it, it1)
+            }
+        }
         val cameraUpdate = latLng?.let { CameraUpdateFactory.newLatLngZoom(it, 15f) }
         if (cameraUpdate != null) {
             googleMap.moveCamera(cameraUpdate)
@@ -107,7 +109,7 @@ class AddFavouriteSummaryFragment : Fragment() {
     }
 
     private fun getImageIfEdited() {
-        if(sharedViewModel.imageUri.value == null) {
+        if (sharedViewModel.imageUri.value == null) {
             Glide
                 .with(this)
                 .load(sharedViewModel.imageURL.value)
@@ -119,16 +121,16 @@ class AddFavouriteSummaryFragment : Fragment() {
 
 
     private fun hideElements() {
-        if(sharedViewModel.imageUri.value == null) {
+        if (sharedViewModel.imageUri.value == null) {
             binding.imSummaryImage.setImageResource(R.drawable.border)
         }
-        if(sharedViewModel.stars.value == null && sharedViewModel.review.value == null) {
+        if (sharedViewModel.stars.value == null && sharedViewModel.review.value == null) {
             binding.dividerThree.visibility = View.INVISIBLE
         }
-        if(sharedViewModel.stars.value == null) {
+        if (sharedViewModel.stars.value == null) {
             binding.rbSummaryStars.visibility = View.INVISIBLE
         }
-        if(sharedViewModel.review.value == null) {
+        if (sharedViewModel.review.value == null) {
             binding.tvSummaryReview.visibility = View.INVISIBLE
         }
     }
@@ -149,7 +151,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         val iconsArray = resources.obtainTypedArray(R.array.categories_icons)
         val categoryArray = resources.getStringArray(R.array.categories_array)
         val categoryIndex = categoryArray.indexOf(sharedViewModel.category.value)
-        if(categoryIndex != -1) {
+        if (categoryIndex != -1) {
             val icon = iconsArray.getResourceId(categoryIndex, -1)
             binding.imCategory.setImageResource(icon)
         } else {
@@ -158,9 +160,9 @@ class AddFavouriteSummaryFragment : Fragment() {
         iconsArray.recycle()
     }
 
-    private fun saveImage(view:View) {
+    private fun saveImage(view: View) {
         disableButtons()
-        if(sharedViewModel.imageUri.value != null) { //If you have selected an image, if first saves the image to firebase.storage, then saves the post in firebase
+        if (sharedViewModel.imageUri.value != null) { //If you have selected an image, if first saves the image to firebase.storage, then saves the post in firebase
             val fileName = "image_${System.currentTimeMillis()}.jpg"
             val filePath = sharedViewModel.imageUri.value
             val storageRef = storage.reference.child("images").child(fileName)
@@ -197,7 +199,7 @@ class AddFavouriteSummaryFragment : Fragment() {
             imageURL = sharedViewModel.imageURL.value,
             reviewTitle = sharedViewModel.reviewTitle.value
         )
-        if(sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
+        if (sharedViewModel.docID.value != null) { // if it has a docID, you edit existing post
             editPost(view, place)
         } else {  //if it is a new post, it saves a new
             savePlace(view, place)
@@ -205,9 +207,10 @@ class AddFavouriteSummaryFragment : Fragment() {
     }
 
     private fun savePlace(view: View, place: Place) {
-        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").add(place)
-            .addOnCompleteListener {task ->
-                if(task.isSuccessful) {
+        db.collection("users").document(CurrentUser.userID.toString()).collection("favourites")
+            .add(place)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     (activity as MainActivity).getUserFavourites()
                     enableButtons()
                     findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
@@ -220,9 +223,11 @@ class AddFavouriteSummaryFragment : Fragment() {
     private fun editPost(view: View, place: Place) {
 
         sharedViewModel.docID.value?.let {
-            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites").document(
-                it
-            ).update("title", place.title,
+            db.collection("users").document(CurrentUser.userID.toString()).collection("favourites")
+                .document(
+                    it
+                ).update(
+                "title", place.title,
                 "description", place.description,
                 "category", place.category,
                 "stars", place.stars,
@@ -231,9 +236,10 @@ class AddFavouriteSummaryFragment : Fragment() {
                 "lat", place.lat,
                 "lng", place.lng,
                 "imageURL", place.imageURL,
-                "reviewTitle", place.reviewTitle)
-                .addOnCompleteListener {task ->
-                    if(task.isSuccessful) {
+                "reviewTitle", place.reviewTitle
+            )
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
                         (activity as MainActivity).getUserFavourites()
                         enableButtons()
                         findNavController().navigate(R.id.action_addFavouriteSummaryFragment_to_favourites_fragment)
@@ -257,6 +263,7 @@ class AddFavouriteSummaryFragment : Fragment() {
         binding.btnSummarySave.isEnabled = true
         binding.btnSummaryCancel.isEnabled = true
     }
+
     companion object {
         /**
          * Use this factory method to create a new instance of

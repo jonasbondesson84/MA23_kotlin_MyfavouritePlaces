@@ -49,6 +49,7 @@ class LoginFragment : Fragment() {
 
         override fun afterTextChanged(s: Editable?) {}
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

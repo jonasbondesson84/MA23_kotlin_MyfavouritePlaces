@@ -8,7 +8,7 @@ import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 
-class PlacesInfoAdapter(val context: Context): GoogleMap.InfoWindowAdapter {
+class PlacesInfoAdapter(val context: Context) : GoogleMap.InfoWindowAdapter {
 
     private val layoutInflater = LayoutInflater.from(context)
 
@@ -29,7 +29,7 @@ class PlacesInfoAdapter(val context: Context): GoogleMap.InfoWindowAdapter {
         val iconsArray = context.resources.obtainTypedArray(R.array.categories_icons)
         val categoryArray = context.resources.getStringArray(R.array.categories_array)
         val categoryIndex = categoryArray.indexOf(place?.category)
-        if(categoryIndex != -1) {
+        if (categoryIndex != -1) {
             val icon = iconsArray.getResourceId(categoryIndex, -1)
             imImage.setImageResource(icon)
         } else {
